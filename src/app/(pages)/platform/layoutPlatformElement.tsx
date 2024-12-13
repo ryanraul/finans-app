@@ -9,9 +9,11 @@ export default function LayoutPlatformElement({
   return (
     <SidebarProvider defaultOpen={true}>
       <AppSidebar />
-      <main className="flex w-full h-full p-8">
-        <SidebarTrigger />
-        {children}
+      <main className="flex flex-col w-full">
+        <header className="flex flex-row  grow-[3] w-full">
+          <SidebarTrigger className="sm:hidden" />
+        </header>
+        <section className="flex grow-[9]">{children}</section>
       </main>
     </SidebarProvider>
   );
