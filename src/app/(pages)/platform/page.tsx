@@ -1,9 +1,13 @@
-export default function Platform() {
+"use client";
+
+import LayoutPlatform from "./layout";
+import { useContext } from "react";
+import { AppContext } from "@/contexts/AppContext";
+
+export default function Plataform({ children }: { children: React.ReactNode }) {
+  const { user, disconnectUser } = useContext(AppContext);
+
   return (
-    <main className="flex w-full">
-      <section>
-        <h2>PLATFORM HOME</h2>
-      </section>
-    </main>
+    user && <LayoutPlatform logout={disconnectUser}>{children}</LayoutPlatform>
   );
 }

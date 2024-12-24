@@ -11,7 +11,10 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
-import { redirect } from "next/navigation";
+
+interface IAppSideBarProps {
+  logout: () => void;
+}
 
 const items = [
   {
@@ -36,11 +39,7 @@ const items = [
   },
 ];
 
-export function AppSidebar() {
-  function logout() {
-    redirect("/auth");
-  }
-
+export function AppSidebar(appSideBarProps: IAppSideBarProps) {
   return (
     <Sidebar className="bg-primary">
       <SidebarContent>
@@ -64,7 +63,12 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <Button className="bg-red-500 hover:bg-red-800">Logout</Button>
+            <Button
+              className="bg-red-500 hover:bg-red-800"
+              onClick={appSideBarProps.logout}
+            >
+              Logout
+            </Button>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
