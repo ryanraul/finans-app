@@ -14,7 +14,10 @@ interface IFinansTableProps<T> {
 }
 
 export default function FinansTable<T>(finansTableProps: IFinansTableProps<T>) {
-  const headers = finansTableProps.data[0].getHeaders();
+  const headers =
+    finansTableProps.data.length > 0
+      ? finansTableProps.data?.[0].getHeaders()
+      : [];
 
   return (
     <Table>

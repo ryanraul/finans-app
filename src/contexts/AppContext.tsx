@@ -20,10 +20,11 @@ export function useAuth() {
 
 const AppProvider = ({ children }: any) => {
   const [user, setUser] = useState<User | undefined>(undefined);
+  //TODO - Implement accordion with account ids on the side bar
+  const [accountId, setAccountId] = useState<number>();
+  const _ = new FinansAxiosApi();
 
   useEffect(() => {
-    const _ = new FinansAxiosApi();
-
     FinansAxiosApi.get<{ username: string }>("/user/profile").then(
       (response) => {
         if (response.Data?.username) {

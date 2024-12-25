@@ -10,7 +10,6 @@ export const getIncomesHttp = async (
     `/incomes?AccountId=${incomesRequestDto.AccountId}&Page=${incomesRequestDto.Page}&PageSize=${incomesRequestDto.PageSize}`
   )
     .then((response) => {
-      console.log(`AQUI O RESPONSE`, response);
       return response.createInstance(IncomesResponseDto);
     })
     .catch(() => new ApiReponse("", -1, undefined));

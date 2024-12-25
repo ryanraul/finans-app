@@ -34,7 +34,7 @@ export default class Income implements IIncome, TableType<IIncome> {
     const headers: string[] = [];
 
     properties.forEach((p) => {
-      if (p == "id" || p == "date") return;
+      if (p == "id" || p == "date" || p == "fixed") return;
       headers.push(p);
     });
 
