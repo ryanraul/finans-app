@@ -14,7 +14,7 @@ import { useContext, useEffect, useState } from "react";
 import { login, setAccessToken } from "./useLogin";
 import LoginResponseDto from "./types/LoginResponseDto";
 import { redirect } from "next/navigation";
-import ApiReponse from "@/services/ApiResponse";
+import ApiResponse from "@/services/ApiResponse";
 import { User } from "./types/User";
 import { AppContext } from "@/contexts/AppContext";
 
@@ -39,7 +39,7 @@ export default function AuthPage() {
   }
 
   function handleLoginResponse(
-    loginResponse: ApiReponse<LoginResponseDto | undefined>
+    loginResponse: ApiResponse<LoginResponseDto | undefined>
   ) {
     if (loginResponse.Status !== 200) {
       console.log("Error");

@@ -4,7 +4,7 @@ export interface IApiResponse {
   ErrorMessage?: string;
 }
 
-export default class ApiReponse<T> implements IApiResponse {
+export default class ApiResponse<T> implements IApiResponse {
   constructor();
   constructor(ErrorMessage: string, Status: number, Data: T);
   constructor(

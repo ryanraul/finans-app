@@ -1,5 +1,5 @@
 import axios, { AxiosHeaders, AxiosInstance, AxiosRequestHeaders } from "axios";
-import ApiReponse from "./ApiResponse";
+import ApiResponse from "./ApiResponse";
 import RefreshTokenDto from "./RefreshTokenDto";
 
 export class FinansAxiosApi {
@@ -67,13 +67,13 @@ export class FinansAxiosApi {
   static getErrorResponse(error: any) {
     if (!error.response && error.message) {
       if (error.message.includes("Network Error"))
-        return new ApiReponse<undefined>("Network problems...", 0, undefined);
+        return new ApiResponse<undefined>("Network problems...", 0, undefined);
 
       if (error.message.includes("timeout"))
-        return new ApiReponse<undefined>("Timeout error", 0, undefined);
+        return new ApiResponse<undefined>("Timeout error", 0, undefined);
     }
 
-    return new ApiReponse<undefined>("Api Failed", 0, undefined);
+    return new ApiResponse<undefined>("Api Failed", 0, undefined);
   }
 
   static async post<T>(url: string, data: any) {
@@ -84,7 +84,7 @@ export class FinansAxiosApi {
         headers: FinansAxiosApi.getRequestHeaders(),
       })
       .then((response) => {
-        return new ApiReponse<T>("", 200, response.data);
+        return new ApiResponse<T>("", 200, response.data);
       })
       .catch((error) => {
         return FinansAxiosApi.getErrorResponse(error);
@@ -96,7 +96,7 @@ export class FinansAxiosApi {
       .get(url, {
         headers: this.getRequestHeaders(),
       })
-      .then((response) => new ApiReponse<T>("", 200, response.data))
+      .then((response) => new ApiResponse<T>("", 200, response.data))
       .catch((error) => FinansAxiosApi.getErrorResponse(error));
   }
 }

@@ -15,6 +15,7 @@ import Income from "./types/Income";
 import { useEffect, useState } from "react";
 import { incomesByAccount } from "./useIncomes";
 import { Button } from "@/components/ui/button";
+import { IncomesDialog } from "@/components/IncomeDialog/IncomeDialog";
 
 export default function Incomes() {
   const [incomes, setIncomes] = useState<Income[]>([]);
@@ -28,20 +29,23 @@ export default function Incomes() {
   return (
     <main className="sm:ml-14 w-full p-4 ">
       <div className="flex justify-end mb-4">
-        <Button className="bg-slate-600 ">
-          <i className="fa-solid fa-plus "></i>Add Income
-        </Button>
+        <IncomesDialog />
       </div>
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <CardChart title="Current Incomes" description="">
           <FinansTable
             caption="A list of your current incomes"
             data={incomes}
+            withDeleteButton={true}
           />
         </CardChart>
 
         <CardChart title="Next Incomes" description="">
-          <FinansTable caption="A list of your next incomes" data={incomes} />
+          <FinansTable
+            caption="A list of your next incomes"
+            data={incomes}
+            withDeleteButton={true}
+          />
         </CardChart>
       </section>
       <section className="mt-10">

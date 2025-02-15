@@ -11,6 +11,7 @@ import {
 interface IFinansTableProps<T> {
   caption: string;
   data: TableType<T>[];
+  withDeleteButton: boolean;
 }
 
 export default function FinansTable<T>(finansTableProps: IFinansTableProps<T>) {
@@ -38,6 +39,11 @@ export default function FinansTable<T>(finansTableProps: IFinansTableProps<T>) {
                   {row.getValueByHeader(cell as keyof T)}
                 </TableCell>
               ))}
+              {finansTableProps.withDeleteButton ? (
+                <TableCell key={headers.length}>{"delete"}</TableCell>
+              ) : (
+                <></>
+              )}
             </TableRow>
           );
         })}
