@@ -1,6 +1,6 @@
 import axios, { AxiosHeaders, AxiosInstance, AxiosRequestHeaders } from "axios";
 import ApiResponse from "./ApiResponse";
-import RefreshTokenDto from "./RefreshTokenDto";
+import { getAuthRefreshToken } from "@/__generated__/api";
 
 export class FinansAxiosApi {
   constructor() {
@@ -8,6 +8,7 @@ export class FinansAxiosApi {
   }
 
   static jwtBearerToken = "";
+  static _retryToken = false;
   static clientHttp: AxiosInstance;
 
   static setTokenJwt(token: string) {
@@ -26,23 +27,31 @@ export class FinansAxiosApi {
       withCredentials: true,
     });
 
+    axiosInstance.interceptors.request.use((config) => {
+      config.headers.Authorization =
+        !config._retry && this.jwtBearerToken
+          ? `${this.jwtBearerToken}`
+          : config.headers.Authorization;
+
+      return config;
+    });
+
     axiosInstance.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
+
         if (error.response.status === 401 && !originalRequest._retry) {
           try {
-            const response = await this.get<RefreshTokenDto>(
-              "/auth/refreshToken"
-            );
+            const response = await getAuthRefreshToken();
+            this.setTokenJwt(response.accessToken!);
 
-            this.setTokenJwt(response.Data?.accessToken!);
-            originalRequest.headers.Authorization = `Bearer ${response.Data?.accessToken}`;
+            originalRequest.headers.Authorization = `Bearer ${response.accessToken!}`;
             originalRequest._retry = true;
 
             return axiosInstance(originalRequest);
-          } catch {
-            console.log(`Error interceptor`);
+          } catch (e) {
+            console.log(`Error interceptor`, e);
           }
         }
 
@@ -51,6 +60,17 @@ export class FinansAxiosApi {
     );
 
     return axiosInstance;
+  }
+
+  static getCookie(name: string) {
+    let cookies = document.cookie.split("; ");
+    for (let cookie of cookies) {
+      let [key, value] = cookie.split("=");
+      if (key === name) {
+        return decodeURIComponent(value);
+      }
+    }
+    return null;
   }
 
   static updateConnectionData() {

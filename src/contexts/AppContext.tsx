@@ -1,8 +1,9 @@
 "use client";
 
-import { userLogout } from "@/app/(pages)/auth/api/logout.api";
-import { User } from "@/app/(pages)/auth/types/User";
-import { FinansAxiosApi } from "@/services/FinansAxiosApi";
+import { userProfile } from "@/__generated__/api";
+import { userLogout } from "@/app/auth/api/logout.api";
+import { User } from "@/app/auth/types/User";
+import { customInstance } from "@/services/custom-instance";
 import { redirect } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -22,17 +23,25 @@ const AppProvider = ({ children }: any) => {
   const [user, setUser] = useState<User | undefined>(undefined);
   //TODO - Implement accordion with account ids on the side bar
   const [accountId, setAccountId] = useState<number>();
-  const _ = new FinansAxiosApi();
 
   useEffect(() => {
-    FinansAxiosApi.get<{ username: string }>("/user/profile").then(
-      (response) => {
-        if (response.Data?.username) {
-          const userResponse = new User(response.Data?.username);
-          setUser(userResponse);
-        }
-      }
-    );
+    // FinansAxiosApi.get<{ username: string }>("/user/profile").then(
+    //   (response) => {
+    //     if (response.Data?.username) {
+    //       const userResponse = new User(response.Data?.username);
+    //       setUser(userResponse);
+    //     }
+    //   }
+    // );
+
+    console.log("caindo aquii mano");
+
+    // userProfile().then((response) => {
+    //   if (response.username) {
+    //     const userResponse = new User(response.username);
+    //     setUser(userResponse);
+    //   }
+    // });
   }, []);
 
   async function disconnectUser() {

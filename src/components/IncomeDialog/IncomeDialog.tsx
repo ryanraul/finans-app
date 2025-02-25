@@ -11,9 +11,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import Income from "@/app/(pages)/platform/incomes/types/Income";
-import { saveIncome } from "@/app/(pages)/platform/incomes/api/incomes.api";
+import Income from "@/app/platform/incomes/types/Income";
 import { Checkbox } from "../ui/checkbox";
+import { CreateIncomeRequest } from "@/__generated__/types";
+import { postIncomes } from "@/__generated__/api";
 
 export function IncomesDialog() {
   const [newIncome, setNewIncome] = useState<Income>(
@@ -33,20 +34,24 @@ export function IncomesDialog() {
   };
 
   const handleSubmit = () => {
-    // Validate inputs (if necessary)
     if (!newIncome.description || !newIncome.amount) {
       alert("Please fill out all required fields.");
       return;
     }
 
-    console.log("Income saved:", newIncome);
-    saveIncome(newIncome, 3).then((response) => {
-      if (response.Status == 200) {
-        setNewIncome(
-          new Income({ description: "", amount: 0, fixed: false, date: "" })
-        );
-      }
+    const request: CreateIncomeRequest = {
+      description: newIncome.description,
+      amount: newIncome.amount,
+      fixed: newIncome.fixed ?? false,
+      date: newIncome.date,
+      accountId: 3,
+    };
+
+    postIncomes(request).then((response) => {
       console.log(`response ==> `, response);
+      setNewIncome(
+        new Income({ description: "", amount: 0, fixed: false, date: "" })
+      );
     });
   };
 
