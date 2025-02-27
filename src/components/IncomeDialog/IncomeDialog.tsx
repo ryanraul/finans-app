@@ -10,50 +10,57 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import Income from "@/app/platform/incomes/types/Income";
 import { Checkbox } from "../ui/checkbox";
 import { CreateIncomeRequest } from "@/__generated__/types";
 import { postIncomes } from "@/__generated__/api";
+import { z } from "zod";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const incomeSchema = z.object({
+  description: z.string().min(2, "Income description is mandatory."),
+  amount: z.number().positive("Amount should be a positive value."),
+  fixed: z.boolean().default(false).optional(),
+  date: z.date(),
+});
+
+type IncomeSchema = z.infer<typeof incomeSchema>;
 
 export function IncomesDialog() {
-  const [newIncome, setNewIncome] = useState<Income>(
-    new Income({ description: "", amount: 0, fixed: false, date: "" })
-  );
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors },
+  } = useForm<IncomeSchema>({
+    resolver: zodResolver(incomeSchema),
+    defaultValues: {
+      description: "",
+      amount: 0,
+      fixed: false,
+      date: new Date(),
+    },
+  });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value, type, checked } = e.target;
-    console.log(`type`, type);
-    setNewIncome((prevState) => {
-      const updatedIncome = new Income({
-        ...prevState,
-        [id]: type === "checkbox" ? checked : value,
-      });
-      return updatedIncome;
-    });
-  };
-
-  const handleSubmit = () => {
-    if (!newIncome.description || !newIncome.amount) {
-      alert("Please fill out all required fields.");
-      return;
-    }
-
+  async function createIncome({
+    description,
+    amount,
+    fixed,
+    date,
+  }: IncomeSchema) {
     const request: CreateIncomeRequest = {
-      description: newIncome.description,
-      amount: newIncome.amount,
-      fixed: newIncome.fixed ?? false,
-      date: newIncome.date,
+      description: description,
+      amount: amount,
+      fixed: fixed ?? false,
+      date: date,
       accountId: 3,
     };
 
-    postIncomes(request).then((response) => {
-      console.log(`response ==> `, response);
-      setNewIncome(
-        new Income({ description: "", amount: 0, fixed: false, date: "" })
-      );
-    });
-  };
+    await postIncomes(request);
+
+    reset();
+  }
 
   return (
     <Dialog>
@@ -67,62 +74,84 @@ export function IncomesDialog() {
           <DialogTitle>Add Income</DialogTitle>
           <DialogDescription>Add here your income.</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="flex items-center gap-4">
-            <Label htmlFor="description" className="text-right">
-              Description
-            </Label>
-            <Input
-              id="description"
-              className="col-span-2"
-              value={newIncome.description || ""}
-              onChange={handleInputChange}
-            />
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="fixed"
-                value={newIncome.fixed ? 1 : 0}
-                onCheckedChange={(checkedState) => {
-                  newIncome.fixed = checkedState as boolean;
-                }}
-              />
-              <label
-                htmlFor="fixed"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Fixed?
-              </label>
-            </div>
-          </div>
-          <div className="flex gap-4">
+        <form onSubmit={handleSubmit(createIncome)}>
+          <div className="grid gap-4 py-4">
             <div className="flex items-center gap-4">
-              <Label htmlFor="amount" className="text-right">
-                Amount
+              <Label htmlFor="description" className="text-right">
+                Description
               </Label>
               <Input
-                id="amount"
-                value={newIncome.amount}
-                onChange={handleInputChange}
+                type="text"
+                className="col-span-2"
+                {...register("description")}
+              />
+
+              <Controller
+                name="fixed"
+                control={control}
+                render={({ field }) => (
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="fixed"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                    <label
+                      htmlFor="fixed"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Fixed?
+                    </label>
+                  </div>
+                )}
               />
             </div>
-            <div className="flex items-center gap-4">
-              <Label htmlFor="date" className="text-right">
-                Date
-              </Label>
-              <Input
-                id="date"
-                type="date"
-                value={newIncome.date || ""}
-                onChange={handleInputChange}
-              />
+
+            {errors?.description && (
+              <p className="text-danger text-xs font-semibold">
+                {errors.description.message}
+              </p>
+            )}
+            {errors?.fixed && (
+              <p className="text-danger text-xs font-semibold">
+                {errors.fixed.message}
+              </p>
+            )}
+
+            <div className="flex gap-4">
+              <div className="flex items-center gap-4">
+                <Label htmlFor="amount" className="text-right">
+                  Amount
+                </Label>
+                <Input {...register("amount", { valueAsNumber: true })} />
+              </div>
+              <div className="flex items-center gap-4">
+                <Label htmlFor="date" className="text-right">
+                  Date
+                </Label>
+                <Input
+                  type="date"
+                  {...register("date", { valueAsDate: true })}
+                />
+              </div>
             </div>
+
+            {errors?.amount && (
+              <p className="text-danger text-xs font-semibold">
+                {errors.amount.message}
+              </p>
+            )}
+            {errors?.date && (
+              <p className="text-danger text-xs font-semibold">
+                {errors.date.message}
+              </p>
+            )}
           </div>
-        </div>
-        <DialogFooter>
-          <Button type="submit" onClick={handleSubmit}>
-            Save changes
-          </Button>
-        </DialogFooter>
+
+          <DialogFooter>
+            <Button type="submit">Save changes</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
