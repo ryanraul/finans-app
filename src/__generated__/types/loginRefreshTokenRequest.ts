@@ -4,10 +4,7 @@
  * Finans | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { UserResponse } from './userResponse';
 
-export interface LoginResponse {
-  userResponse: UserResponse;
-  token: string;
+export interface LoginRefreshTokenRequest {
   refreshToken: string;
 }

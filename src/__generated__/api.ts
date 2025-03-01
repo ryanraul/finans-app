@@ -8,12 +8,14 @@ import type {
   CreateAccountRequest,
   CreateExpenseRequest,
   CreateIncomeRequest,
+  GetEvolutionIncomesResponse,
   GetExpenseByIdResponse,
   GetExpensesParams,
   GetIncomeByIdResponse,
+  GetIncomesGetevolutionincomesParams,
   GetIncomesParams,
   GetUserProfileResponse,
-  LoginRefreshTokenResponse,
+  LoginRefreshTokenRequest,
   LoginRequest,
   LoginResponse,
   PagedListOfGetExpensesResponse,
@@ -61,11 +63,13 @@ export const postAuthLogin = (
 /**
  * @summary Refresh token
  */
-export const getAuthRefreshToken = (
-    
+export const postAuthRefreshToken = (
+    loginRefreshTokenRequest: LoginRefreshTokenRequest,
  options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<LoginRefreshTokenResponse>(
-      {url: `/auth/refreshToken`, method: 'GET'
+      return customInstance<LoginResponse>(
+      {url: `/auth/refreshToken`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: loginRefreshTokenRequest
     },
       options);
     }
@@ -159,6 +163,19 @@ export const deleteIncomesId = (
     }
   
 /**
+ * @summary Get evolution incomes
+ */
+export const getIncomesGetevolutionincomes = (
+    params: GetIncomesGetevolutionincomesParams,
+ options?: SecondParameter<typeof customInstance>,) => {
+      return customInstance<GetEvolutionIncomesResponse[]>(
+      {url: `/incomes/getevolutionincomes`, method: 'GET',
+        params
+    },
+      options);
+    }
+  
+/**
  * @summary Create an expense
  */
 export const postExpenses = (
@@ -234,7 +251,7 @@ export const userProfile = (
   
 export type PostAuthSignupResult = NonNullable<Awaited<ReturnType<typeof postAuthSignup>>>
 export type PostAuthLoginResult = NonNullable<Awaited<ReturnType<typeof postAuthLogin>>>
-export type GetAuthRefreshTokenResult = NonNullable<Awaited<ReturnType<typeof getAuthRefreshToken>>>
+export type PostAuthRefreshTokenResult = NonNullable<Awaited<ReturnType<typeof postAuthRefreshToken>>>
 export type LogoutResult = NonNullable<Awaited<ReturnType<typeof logout>>>
 export type PostAccountsResult = NonNullable<Awaited<ReturnType<typeof postAccounts>>>
 export type PostIncomesResult = NonNullable<Awaited<ReturnType<typeof postIncomes>>>
@@ -242,6 +259,7 @@ export type GetIncomesResult = NonNullable<Awaited<ReturnType<typeof getIncomes>
 export type PutIncomesResult = NonNullable<Awaited<ReturnType<typeof putIncomes>>>
 export type GetIncomesIdResult = NonNullable<Awaited<ReturnType<typeof getIncomesId>>>
 export type DeleteIncomesIdResult = NonNullable<Awaited<ReturnType<typeof deleteIncomesId>>>
+export type GetIncomesGetevolutionincomesResult = NonNullable<Awaited<ReturnType<typeof getIncomesGetevolutionincomes>>>
 export type PostExpensesResult = NonNullable<Awaited<ReturnType<typeof postExpenses>>>
 export type GetExpensesResult = NonNullable<Awaited<ReturnType<typeof getExpenses>>>
 export type PutExpensesResult = NonNullable<Awaited<ReturnType<typeof putExpenses>>>

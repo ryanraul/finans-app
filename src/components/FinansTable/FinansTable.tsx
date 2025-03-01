@@ -1,3 +1,5 @@
+import { Trash } from "lucide-react";
+import { Button } from "../ui/button";
 import {
   TableCaption,
   TableHeader,
@@ -11,7 +13,7 @@ import {
 interface IFinansTableProps<T> {
   caption: string;
   data: TableType<T>[];
-  withDeleteButton: boolean;
+  delete?: (obj: T) => void;
 }
 
 export default function FinansTable<T>(finansTableProps: IFinansTableProps<T>) {
@@ -39,8 +41,12 @@ export default function FinansTable<T>(finansTableProps: IFinansTableProps<T>) {
                   {row.getValueByHeader(cell as keyof T)}
                 </TableCell>
               ))}
-              {finansTableProps.withDeleteButton ? (
-                <TableCell key={headers.length}>{"delete"}</TableCell>
+              {finansTableProps.delete ? (
+                <TableCell key={headers.length}>
+                  <Button onClick={() => finansTableProps.delete!(row as T)}>
+                    <Trash />
+                  </Button>
+                </TableCell>
               ) : (
                 <></>
               )}

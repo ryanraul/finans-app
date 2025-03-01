@@ -4,7 +4,7 @@
  * Finans | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { GetIncomesResponse } from "./getIncomesResponse";
+import type { GetIncomesResponse } from './getIncomesResponse';
 
 export interface PagedListOfGetIncomesResponse {
   items: GetIncomesResponse[];

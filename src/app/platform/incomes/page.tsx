@@ -14,22 +14,46 @@ import {
 import Income from "./types/Income";
 import { useEffect, useState } from "react";
 import { IncomesDialog } from "@/components/IncomeDialog/IncomeDialog";
-import { getIncomes } from "@/__generated__/api";
+import {
+  deleteIncomesId,
+  getIncomes,
+  getIncomesGetevolutionincomes,
+} from "@/__generated__/api";
 import IncomesRequestDto from "./api/IncomesRequestDto";
+import { GetEvolutionIncomesResponse } from "@/__generated__/types";
+import { ChartConfig } from "@/components/ui/chart";
+
+const chartConfig = {
+  total: {
+    label: "Total",
+    color: "#2563eb",
+  },
+} satisfies ChartConfig;
 
 export default function Incomes() {
   const [incomes, setIncomes] = useState<Income[]>([]);
+  const [evolutionIncomes, setEvolutionIncomes] = useState<
+    GetEvolutionIncomesResponse[]
+  >([]);
 
   useEffect(() => {
-    let teste = new IncomesRequestDto(3, 1, 10);
-    getIncomes(teste).then((response) => {
+    let getIncomeListRequest = new IncomesRequestDto(3, 1, 10);
+    getIncomes(getIncomeListRequest).then((response) => {
       let lista: Income[] = [];
       response.items.forEach((x) => {
         lista.push(new Income(x));
       });
       if (response?.items) setIncomes(lista);
     });
+
+    getIncomesGetevolutionincomes({ AccountId: 3 }).then((response) => {
+      if (response) setEvolutionIncomes(response);
+    });
   }, []);
+
+  function deleteIncome(income: Income) {
+    if (income.id) deleteIncomesId(income.id);
+  }
 
   return (
     <main className="sm:ml-14 w-full p-4 ">
@@ -41,16 +65,12 @@ export default function Incomes() {
           <FinansTable
             caption="A list of your current incomes"
             data={incomes}
-            withDeleteButton={true}
+            delete={deleteIncome}
           />
         </CardChart>
 
         <CardChart title="Next Incomes" description="">
-          <FinansTable
-            caption="A list of your next incomes"
-            data={incomes}
-            withDeleteButton={true}
-          />
+          <FinansTable caption="A list of your next incomes" data={incomes} />
         </CardChart>
       </section>
       <section className="mt-10">
@@ -62,7 +82,11 @@ export default function Incomes() {
           </CardHeader>
           <CardDescription></CardDescription>
           <CardContent>
-            <EvolutionChart />
+            <EvolutionChart
+              data={evolutionIncomes}
+              barTemplateConfig={chartConfig}
+              barPropertyName="total"
+            />
           </CardContent>
         </Card>
       </section>

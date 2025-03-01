@@ -5,10 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface GetIncomesResponse {
+export interface AccountResponse {
   id: number;
-  description: string;
-  amount: number;
-  fixed: boolean;
-  date: string;
+  name: string;
 }

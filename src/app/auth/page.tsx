@@ -39,7 +39,12 @@ export default function AuthPage() {
 
   function handleLoginResponse(loginResponse: LoginResponse) {
     console.log(loginResponse);
-    setUser(new User(userName));
+    setUser(
+      new User(
+        loginResponse.userResponse.username,
+        loginResponse.userResponse.accounts
+      )
+    );
     setAccessToken(loginResponse.token);
   }
 
