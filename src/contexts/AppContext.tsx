@@ -44,6 +44,7 @@ const AppProvider = ({ children }: any) => {
       setUser(
         new User(response.userResponse.username, response.userResponse.accounts)
       );
+      setAccountId(response.userResponse.accounts[0].id);
 
       setIsSessionLoading(false);
     });

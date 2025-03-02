@@ -10,5 +10,5 @@ export interface GetIncomesResponse {
   description: string;
   amount: number;
   fixed: boolean;
-  date: string;
+  date: Date;
 }

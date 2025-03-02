@@ -10,6 +10,6 @@ export interface GetExpensesResponse {
   description: string;
   amount: number;
   fixed: boolean;
-  date: string;
+  date: Date;
   plots: number;
 }

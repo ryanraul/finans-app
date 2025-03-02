@@ -10,62 +10,73 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "../ui/checkbox";
-import { CreateIncomeRequest } from "@/__generated__/types";
-import { postIncomes } from "@/__generated__/api";
+import { CreateExpenseRequest } from "@/__generated__/types";
+import { postExpenses } from "@/__generated__/api";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Checkbox } from "@/components/ui/checkbox";
 
-const incomeSchema = z.object({
-  description: z.string().min(2, "Income description is mandatory."),
+const expenseSchema = z.object({
+  description: z.string().min(2, "Expense description is mandatory."),
   amount: z.number().positive("Amount should be a positive value."),
   fixed: z.boolean().default(false).optional(),
   date: z.date(),
+  plots: z.number(),
 });
 
-type IncomeSchema = z.infer<typeof incomeSchema>;
+// public id?: number,
+// public description?: string,
+// public amount?: number,
+// public fixed?: boolean,
+// public date?: string,
+// public plots?: number
 
-interface IIncomeDialogProps {
+type ExpenseSchema = z.infer<typeof expenseSchema>;
+
+interface IExpenseDialogProps {
   accountId: number;
   onCloseDialog: (open: boolean) => void;
 }
 
-export function IncomesDialog({
+export function ExpensesDialog({
   onCloseDialog,
   accountId,
-}: IIncomeDialogProps) {
+}: IExpenseDialogProps) {
   const {
     register,
     handleSubmit,
     reset,
     control,
     formState: { errors },
-  } = useForm<IncomeSchema>({
-    resolver: zodResolver(incomeSchema),
+  } = useForm<ExpenseSchema>({
+    resolver: zodResolver(expenseSchema),
     defaultValues: {
       description: "",
       amount: 0,
       fixed: false,
       date: new Date(),
+      plots: 0,
     },
   });
 
-  async function createIncome({
+  async function createExpense({
     description,
     amount,
     fixed,
     date,
-  }: IncomeSchema) {
-    const request: CreateIncomeRequest = {
+    plots,
+  }: ExpenseSchema) {
+    const request: CreateExpenseRequest = {
       description: description,
       amount: amount,
       fixed: fixed ?? false,
       date: date,
       accountId: accountId,
+      plots: plots,
     };
 
-    await postIncomes(request);
+    await postExpenses(request);
 
     reset();
   }
@@ -74,15 +85,15 @@ export function IncomesDialog({
     <Dialog onOpenChange={onCloseDialog}>
       <DialogTrigger asChild>
         <Button variant="outline">
-          <i className="fa-solid fa-plus "></i> Add Income
+          <i className="fa-solid fa-plus "></i> Add Expense
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[495px]">
         <DialogHeader>
-          <DialogTitle>Add Income</DialogTitle>
-          <DialogDescription>Add here your income.</DialogDescription>
+          <DialogTitle>Add Expense</DialogTitle>
+          <DialogDescription>Add here your expense.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(createIncome)}>
+        <form onSubmit={handleSubmit(createExpense)}>
           <div className="grid gap-4 py-4">
             <div className="flex items-center gap-4">
               <Label htmlFor="description" className="text-right">
@@ -133,6 +144,14 @@ export function IncomesDialog({
                 </Label>
                 <Input {...register("amount", { valueAsNumber: true })} />
               </div>
+
+              <div className="flex items-center gap-4">
+                <Label htmlFor="plots" className="text-right">
+                  Plots
+                </Label>
+                <Input {...register("plots", { valueAsNumber: true })} />
+              </div>
+
               <div className="flex items-center gap-4">
                 <Label htmlFor="date" className="text-right">
                   Date
@@ -147,6 +166,11 @@ export function IncomesDialog({
             {errors?.amount && (
               <p className="text-danger text-xs font-semibold">
                 {errors.amount.message}
+              </p>
+            )}
+            {errors?.plots && (
+              <p className="text-danger text-xs font-semibold">
+                {errors.plots.message}
               </p>
             )}
             {errors?.date && (

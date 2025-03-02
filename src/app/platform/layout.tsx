@@ -13,20 +13,13 @@ interface ILayoutPlatformProps {
 export default function LayoutPlatform(
   layoutPlatformProps: ILayoutPlatformProps
 ) {
-  const { user, isSessionLoading, disconnectUser, setAccountId } =
-    useContext(AppContext);
+  const { user, isSessionLoading, disconnectUser } = useContext(AppContext);
 
   useEffect(() => {
     if (!user && !isSessionLoading) {
       redirect("/auth");
     }
   }, [user, isSessionLoading]);
-
-  useEffect(() => {
-    if (user?.Accounts && user.Accounts.length > 0) {
-      setAccountId(user.Accounts[0].id);
-    }
-  }, [user, setAccountId]);
 
   return (
     user && (

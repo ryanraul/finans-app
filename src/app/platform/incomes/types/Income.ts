@@ -1,24 +1,16 @@
 import { GetIncomesResponse } from "@/__generated__/types";
 
-interface IIncome {
-  id?: number;
-  description?: string;
-  amount?: number;
-  fixed?: boolean;
-  date?: any;
-}
-
 export default class Income
   implements GetIncomesResponse, TableType<GetIncomesResponse>
 {
   constructor(iIncome?: GetIncomesResponse);
   constructor(
-    iIincome?: GetIncomesResponse,
-    id?: number | IIncome,
+    idOrIincome?: GetIncomesResponse,
+    id?: number,
     description?: string,
     amount?: number,
     fixed?: boolean,
-    date?: any
+    date?: Date
   );
   constructor(
     iIncome?: GetIncomesResponse,
@@ -26,9 +18,8 @@ export default class Income
     public description?: string,
     public amount?: number,
     public fixed?: boolean,
-    public date?: any
+    public date?: Date
   ) {
-    console.log(`iIincome ==>`, iIncome);
     if (iIncome) {
       Object.assign(this, iIncome);
     }

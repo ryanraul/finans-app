@@ -8,8 +8,10 @@ import type {
   CreateAccountRequest,
   CreateExpenseRequest,
   CreateIncomeRequest,
+  GetEvolutionExpensesResponse,
   GetEvolutionIncomesResponse,
   GetExpenseByIdResponse,
+  GetExpensesGetEvolutionExpensesParams,
   GetExpensesParams,
   GetIncomeByIdResponse,
   GetIncomesGetevolutionincomesParams,
@@ -240,6 +242,19 @@ export const deleteExpensesId = (
       options);
     }
   
+/**
+ * @summary Get evolution expenses
+ */
+export const getExpensesGetEvolutionExpenses = (
+    params: GetExpensesGetEvolutionExpensesParams,
+ options?: SecondParameter<typeof customInstance>,) => {
+      return customInstance<GetEvolutionExpensesResponse[]>(
+      {url: `/expenses/getEvolutionExpenses`, method: 'GET',
+        params
+    },
+      options);
+    }
+  
 export const userProfile = (
     
  options?: SecondParameter<typeof customInstance>,) => {
@@ -265,4 +280,5 @@ export type GetExpensesResult = NonNullable<Awaited<ReturnType<typeof getExpense
 export type PutExpensesResult = NonNullable<Awaited<ReturnType<typeof putExpenses>>>
 export type GetExpensesIdResult = NonNullable<Awaited<ReturnType<typeof getExpensesId>>>
 export type DeleteExpensesIdResult = NonNullable<Awaited<ReturnType<typeof deleteExpensesId>>>
+export type GetExpensesGetEvolutionExpensesResult = NonNullable<Awaited<ReturnType<typeof getExpensesGetEvolutionExpenses>>>
 export type UserProfileResult = NonNullable<Awaited<ReturnType<typeof userProfile>>>
