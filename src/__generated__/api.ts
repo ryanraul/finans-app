@@ -13,15 +13,15 @@ import type {
   GetExpenseByIdResponse,
   GetExpensesGetEvolutionExpensesParams,
   GetExpensesParams,
+  GetExpensesResponse,
   GetIncomeByIdResponse,
   GetIncomesGetevolutionincomesParams,
   GetIncomesParams,
+  GetIncomesResponse,
   GetUserProfileResponse,
   LoginRefreshTokenRequest,
   LoginRequest,
   LoginResponse,
-  PagedListOfGetExpensesResponse,
-  PagedListOfGetIncomesResponse,
   SignUpRequest,
   SignUpResponse,
   UpdateExpenseRequest,
@@ -119,7 +119,7 @@ export const postIncomes = (
 export const getIncomes = (
     params: GetIncomesParams,
  options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<PagedListOfGetIncomesResponse>(
+      return customInstance<GetIncomesResponse[]>(
       {url: `/incomes`, method: 'GET',
         params
     },
@@ -197,7 +197,7 @@ export const postExpenses = (
 export const getExpenses = (
     params: GetExpensesParams,
  options?: SecondParameter<typeof customInstance>,) => {
-      return customInstance<PagedListOfGetExpensesResponse>(
+      return customInstance<GetExpensesResponse[]>(
       {url: `/expenses`, method: 'GET',
         params
     },

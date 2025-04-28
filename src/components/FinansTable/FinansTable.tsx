@@ -8,7 +8,10 @@ import {
   TableBody,
   TableCell,
   Table,
+  TableFooter,
 } from "../ui/table";
+import { useEffect, useState } from "react";
+import { EnumTableHeaderType } from "@/app/platform/incomes/types/EnumTableHeaderType";
 
 interface IFinansTableProps<T> {
   caption: string;
@@ -17,10 +20,39 @@ interface IFinansTableProps<T> {
 }
 
 export default function FinansTable<T>(finansTableProps: IFinansTableProps<T>) {
-  const headers =
+  const [clickedRow, setClickedRow] = useState<Number>(-1);
+  const [calculableHeaders] = useState<string[]>(
+    finansTableProps.data?.[0].getCalculableHeaders()
+  );
+  const [headers] = useState<TableHeaderProps[]>(
     finansTableProps.data.length > 0
       ? finansTableProps.data?.[0].getHeaders()
-      : [];
+      : []
+  );
+
+  const [calculableCells, setCalculableCells] = useState<any[]>([]);
+  useEffect(() => {
+    const calculableCellsAux: any[] = [];
+    calculableHeaders.forEach((calcHeader) => {
+      const totalColumn = finansTableProps.data.reduce(
+        (total, dataRow) =>
+          total + dataRow.getValueByHeader(calcHeader as keyof T),
+        0
+      );
+
+      calculableCellsAux.push(totalColumn.toFixed(2));
+    });
+
+    setCalculableCells(calculableCellsAux);
+  }, [headers]);
+
+  const getFormattedValue = (row: TableType<T>, cell: TableHeaderProps) => {
+    switch (cell.type) {
+      case EnumTableHeaderType.CurrencyAmount:
+        return `R$ ${row.getValueByHeader(cell.key as keyof T)}`;
+    }
+    return row.getValueByHeader(cell.key as keyof T);
+  };
 
   return (
     <Table>
@@ -28,32 +60,36 @@ export default function FinansTable<T>(finansTableProps: IFinansTableProps<T>) {
       <TableHeader>
         <TableRow>
           {headers.map((header, headerIndex) => (
-            <TableHead key={headerIndex}>{header}</TableHead>
+            <TableHead key={headerIndex}>{header.description}</TableHead>
           ))}
         </TableRow>
       </TableHeader>
       <TableBody>
         {finansTableProps.data.map((row, rowIndex) => {
           return (
-            <TableRow key={rowIndex}>
+            <TableRow onClick={() => setClickedRow(rowIndex)} key={rowIndex}>
               {headers.map((cell, cellIndex) => (
                 <TableCell key={cellIndex}>
-                  {row.getValueByHeader(cell as keyof T)}
+                  {getFormattedValue(row, cell)}
                 </TableCell>
               ))}
-              {finansTableProps.delete ? (
+              {finansTableProps.delete && clickedRow == rowIndex && (
                 <TableCell key={headers.length}>
                   <Button onClick={() => finansTableProps.delete!(row as T)}>
                     <Trash />
                   </Button>
                 </TableCell>
-              ) : (
-                <></>
               )}
             </TableRow>
           );
         })}
       </TableBody>
+      <TableFooter>
+        <TableRow>
+          <TableCell colSpan={headers.length - 1}>Total</TableCell>
+          <TableCell className="text-right">{calculableCells?.[0]}</TableCell>
+        </TableRow>
+      </TableFooter>
     </Table>
   );
 }

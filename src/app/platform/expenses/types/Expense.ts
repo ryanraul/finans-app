@@ -1,11 +1,13 @@
-import { GetExpensesResponse } from "@/__generated__/types";
+import { ExpenseResponse } from "@/__generated__/types";
+import { EnumTableHeaderType } from "../../incomes/types/EnumTableHeaderType";
+import { TableHeaderProps } from "../../incomes/types/TableHeaderProps";
 
 export default class Expense
-  implements GetExpensesResponse, TableType<GetExpensesResponse>
+  implements ExpenseResponse, TableType<ExpenseResponse>
 {
-  constructor(IExpense?: GetExpensesResponse);
+  constructor(IExpense?: ExpenseResponse);
   constructor(
-    idOrIExpense?: GetExpensesResponse,
+    idOrIExpense?: ExpenseResponse,
     id?: number,
     description?: string,
     amount?: number,
@@ -14,7 +16,7 @@ export default class Expense
     plots?: number
   );
   constructor(
-    IExpense?: GetExpensesResponse,
+    IExpense?: ExpenseResponse,
     public id?: number,
     public description?: string,
     public amount?: number,
@@ -24,22 +26,45 @@ export default class Expense
   ) {
     if (IExpense) {
       Object.assign(this, IExpense);
-      console.log("IExpense.date ==> ", IExpense.date);
       date = new Date(IExpense.date);
-      console.log("dateeeee => ", date.getMonth());
     }
   }
 
   getHeaders() {
-    const properties = Object.getOwnPropertyNames(this);
-    const headers: string[] = [];
+    const headers: TableHeaderProps[] = [];
 
-    properties.forEach((p) => {
-      if (p == "id" || p == "date" || p == "fixed") return;
-      headers.push(p);
-    });
+    headers.push(
+      {
+        key: "description",
+        description: "Description",
+        type: EnumTableHeaderType.String,
+      },
+      {
+        key: "amount",
+        description: "Amount",
+        type: EnumTableHeaderType.CurrencyAmount,
+      },
+      { key: "plots", description: "Plots", type: EnumTableHeaderType.Number }
+    );
+
+    // properties.forEach((p) => {
+    //   if (p == "id" || p == "date" || p == "fixed") return;
+    //   headers.push({ key: p });
+    // });
 
     return headers;
+  }
+
+  getCalculableHeaders() {
+    const properties = Object.getOwnPropertyNames(this);
+    const calculableHeaders: string[] = [];
+
+    properties.forEach((p) => {
+      if (p !== "amount") return;
+      calculableHeaders.push(p);
+    });
+
+    return calculableHeaders;
   }
 
   getValueByHeader(header: keyof Expense) {

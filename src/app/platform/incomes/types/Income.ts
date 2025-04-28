@@ -1,11 +1,12 @@
-import { GetIncomesResponse } from "@/__generated__/types";
+import { GetIncomesResponse, IncomeResponse } from "@/__generated__/types";
+import { TableHeaderProps } from "./TableHeaderProps";
 
 export default class Income
-  implements GetIncomesResponse, TableType<GetIncomesResponse>
+  implements IncomeResponse, TableType<IncomeResponse>
 {
-  constructor(iIncome?: GetIncomesResponse);
+  constructor(iIncome?: IncomeResponse);
   constructor(
-    idOrIincome?: GetIncomesResponse,
+    idOrIincome?: IncomeResponse,
     id?: number,
     description?: string,
     amount?: number,
@@ -13,7 +14,7 @@ export default class Income
     date?: Date
   );
   constructor(
-    iIncome?: GetIncomesResponse,
+    iIncome?: IncomeResponse,
     public id?: number,
     public description?: string,
     public amount?: number,
@@ -26,15 +27,31 @@ export default class Income
   }
 
   getHeaders() {
-    const properties = Object.getOwnPropertyNames(this);
-    const headers: string[] = [];
+    const headers: TableHeaderProps[] = [];
 
-    properties.forEach((p) => {
-      if (p == "id" || p == "date" || p == "fixed") return;
-      headers.push(p);
-    });
+    headers.push(
+      { key: "description", description: "Description" },
+      { key: "amount", description: "Amount" }
+    );
+
+    // properties.forEach((p) => {
+    //   if (p == "id" || p == "date" || p == "fixed") return;
+    //   headers.push({ key: p });
+    // });
 
     return headers;
+  }
+
+  getCalculableHeaders() {
+    const properties = Object.getOwnPropertyNames(this);
+    const calculableHeaders: string[] = [];
+
+    properties.forEach((p) => {
+      if (p !== "amount") return;
+      calculableHeaders.push(p);
+    });
+
+    return calculableHeaders;
   }
 
   getValueByHeader(header: keyof Income) {

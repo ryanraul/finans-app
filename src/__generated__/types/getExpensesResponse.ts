@@ -4,12 +4,10 @@
  * Finans | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { ExpenseResponse } from './expenseResponse';
 
 export interface GetExpensesResponse {
-  id: number;
-  description: string;
-  amount: number;
-  fixed: boolean;
-  date: Date;
-  plots: number;
+  month: number;
+  year: number;
+  expenses: ExpenseResponse[];
 }

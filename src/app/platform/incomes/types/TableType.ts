@@ -1,4 +1,5 @@
 interface TableType<T> {
-  getHeaders: () => string[];
+  getHeaders: () => TableHeaderProps[];
+  getCalculableHeaders: () => string[];
   getValueByHeader: (header: keyof T) => any;
 }

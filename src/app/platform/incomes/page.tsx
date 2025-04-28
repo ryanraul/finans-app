@@ -12,17 +12,20 @@ import {
 } from "@/components/ui/card";
 
 import Income from "./types/Income";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { IncomesDialog } from "@/components/IncomeDialog/IncomeDialog";
 import {
   deleteIncomesId,
   getIncomes,
   getIncomesGetevolutionincomes,
 } from "@/__generated__/api";
-import IncomesRequestDto from "./api/IncomesRequestDto";
 import { GetEvolutionIncomesResponse } from "@/__generated__/types";
 import { ChartConfig } from "@/components/ui/chart";
 import { AppContext } from "@/contexts/AppContext";
+import { DateRange } from "react-day-picker";
+import MonthIncome from "./types/MonthIncome";
+import { DatePickerWithRange } from "@/components/date-range-picker";
+import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";
 
 const chartConfig = {
   total: {
@@ -33,41 +36,60 @@ const chartConfig = {
 
 export default function Incomes() {
   const { accountId } = useContext(AppContext);
-  const [incomes, setIncomes] = useState<Income[]>([]);
+
   const [evolutionIncomes, setEvolutionIncomes] = useState<
     GetEvolutionIncomesResponse[]
   >([]);
+  const [monthsIncomes, setMonthsIncomes] = useState<MonthIncome[]>([]);
 
-  useEffect(() => {
-    getIncomes({ AccountId: accountId! }).then((response) => {
-      let lista: Income[] = [];
-      response.items.forEach((x) => {
-        lista.push(new Income(x));
+  const getIncomesMonths = useCallback((dateRange?: DateRange) => {
+    getIncomesGetevolutionincomes({
+      AccountId: accountId ?? -1,
+      StartDate: dateRange?.from,
+      EndDate: dateRange?.to,
+    }).then((response) => {
+      if (response) setEvolutionIncomes(response);
+    });
+
+    getIncomes({
+      AccountId: accountId!,
+      StartDate: dateRange?.from,
+      EndDate: dateRange?.to,
+    }).then((response) => {
+      let monthExpenses: MonthIncome[] = [];
+
+      response.forEach((x) => {
+        let lista: Income[] = [];
+        x.incomes.forEach((income) => lista.push(new Income(income)));
+        monthExpenses.push(new MonthIncome(x.month, x.year, lista));
       });
-      if (response?.items) setIncomes(lista);
+
+      setMonthsIncomes(monthExpenses);
     });
   }, []);
-
-  useEffect(() => {
-    getIncomesGetevolutionincomes({ AccountId: accountId ?? -1 }).then(
-      (response) => {
-        if (response) setEvolutionIncomes(response);
-      }
-    );
-  }, [incomes, setIncomes]);
 
   async function deleteIncome(income: Income) {
     if (!income.id) return;
 
     await deleteIncomesId(income.id);
-    setIncomes((prevIncomes) =>
-      prevIncomes.filter((prevIncome) => prevIncome.id !== income.id)
+    setMonthsIncomes((prevMonthsIncomes) =>
+      prevMonthsIncomes.map((prevMonthIncome) => {
+        prevMonthIncome.incomes = prevMonthIncome.incomes?.filter(
+          (e) => e.id !== income.id
+        );
+
+        return prevMonthIncome;
+      })
     );
   }
 
   return (
     <main className="sm:ml-14 w-full p-4 ">
       <div className="flex justify-end mb-4">
+        <DatePickerWithRange
+          onChangeDates={getIncomesMonths}
+          keyForLocalStorage="expense-date-range"
+        />
         <IncomesDialog
           accountId={accountId!}
           onCloseDialog={(infos: any) => {
@@ -76,26 +98,24 @@ export default function Incomes() {
         />
       </div>
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <CardChart title="Current Incomes" description="">
-          <FinansTable
-            caption="A list of your current incomes"
-            data={incomes.filter(
-              (income) => income.date?.getMonth() === new Date().getMonth()
-            )}
-            delete={deleteIncome}
-          />
-        </CardChart>
-
-        <CardChart title="Next Incomes" description="">
-          <FinansTable
-            caption="A list of your next incomes"
-            data={incomes.filter(
-              (income) =>
-                income.date?.getMonth() ===
-                new Date().setMonth(new Date().getMonth() + 1)
-            )}
-          />
-        </CardChart>
+        {monthsIncomes.map((monthExpense) => {
+          return (
+            monthExpense.incomes && (
+              <CardChart
+                title={`${getMonthDescriptionByNumber(
+                  monthExpense.month
+                )} Expenses`}
+                description=""
+              >
+                <FinansTable
+                  caption="A list of your current expenses"
+                  data={monthExpense.incomes}
+                  delete={deleteIncome}
+                />
+              </CardChart>
+            )
+          );
+        })}
       </section>
       <section className="mt-10">
         <Card>

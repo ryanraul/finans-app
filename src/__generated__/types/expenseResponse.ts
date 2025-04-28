@@ -5,10 +5,11 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface CreateIncomeRequest {
+export interface ExpenseResponse {
+  id: number;
   description: string;
   amount: number;
   fixed: boolean;
   date: string;
-  accountId: number;
+  plots: string;
 }

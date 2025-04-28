@@ -6,6 +6,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 interface IEvolutionChartProps {
@@ -28,7 +29,7 @@ export function EvolutionChart({
           tickLine={false}
           tickMargin={10}
           axisLine={false}
-          tickFormatter={(value) => value}
+          tickFormatter={(value) => getMonthDescriptionByNumber(value)}
         />
         <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />

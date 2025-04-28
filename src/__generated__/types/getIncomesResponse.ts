@@ -4,11 +4,10 @@
  * Finans | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { IncomeResponse } from './incomeResponse';
 
 export interface GetIncomesResponse {
-  id: number;
-  description: string;
-  amount: number;
-  fixed: boolean;
-  date: Date;
+  month: number;
+  year: number;
+  incomes: IncomeResponse[];
 }

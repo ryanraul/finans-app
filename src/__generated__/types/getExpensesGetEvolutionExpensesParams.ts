@@ -6,5 +6,7 @@
  */
 
 export type GetExpensesGetEvolutionExpensesParams = {
-AccountId: number;
+  AccountId: number;
+  StartDate?: Date;
+  EndDate?: Date;
 };

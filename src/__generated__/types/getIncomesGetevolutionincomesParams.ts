@@ -6,7 +6,7 @@
  */
 
 export type GetIncomesGetevolutionincomesParams = {
-AccountId: number;
-Page?: number;
-PageSize?: number;
+  AccountId: number;
+  StartDate?: Date;
+  EndDate?: Date;
 };
