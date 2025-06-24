@@ -25,18 +25,11 @@ const expenseSchema = z.object({
   plots: z.number(),
 });
 
-// public id?: number,
-// public description?: string,
-// public amount?: number,
-// public fixed?: boolean,
-// public date?: string,
-// public plots?: number
-
 type ExpenseSchema = z.infer<typeof expenseSchema>;
 
 interface IExpenseDialogProps {
   accountId: number;
-  onCloseDialog: (open: boolean) => void;
+  onCloseDialog: () => void;
 }
 
 export function ExpensesDialog({
@@ -82,13 +75,17 @@ export function ExpensesDialog({
   }
 
   return (
-    <Dialog onOpenChange={onCloseDialog}>
+    <Dialog
+      onOpenChange={(open) => {
+        if (!open) onCloseDialog();
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">
           <i className="fa-solid fa-plus "></i> Add Expense
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[495px]">
+      <DialogContent className="sm:max-w-[595px]">
         <DialogHeader>
           <DialogTitle>Add Expense</DialogTitle>
           <DialogDescription>Add here your expense.</DialogDescription>
@@ -99,11 +96,42 @@ export function ExpensesDialog({
               <Label htmlFor="description" className="text-right">
                 Description
               </Label>
-              <Input
-                type="text"
-                className="col-span-2"
-                {...register("description")}
-              />
+              <Input type="text" {...register("description")} />
+
+              <Label htmlFor="amount" className="text-right">
+                Amount
+              </Label>
+              <Input {...register("amount", { valueAsNumber: true })} />
+            </div>
+
+            {errors?.description && (
+              <p className="text-danger text-xs font-semibold">
+                {errors.description.message}
+              </p>
+            )}
+            {errors?.fixed && (
+              <p className="text-danger text-xs font-semibold">
+                {errors.fixed.message}
+              </p>
+            )}
+
+            <div className="flex gap-4">
+              <div className="flex items-center gap-4">
+                <Label htmlFor="plots" className="text-right">
+                  Plots
+                </Label>
+                <Input {...register("plots", { valueAsNumber: true })} />
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Label htmlFor="date" className="text-right">
+                  Date
+                </Label>
+                <Input
+                  type="date"
+                  {...register("date", { valueAsDate: true })}
+                />
+              </div>
 
               <Controller
                 name="fixed"
@@ -124,43 +152,6 @@ export function ExpensesDialog({
                   </div>
                 )}
               />
-            </div>
-
-            {errors?.description && (
-              <p className="text-danger text-xs font-semibold">
-                {errors.description.message}
-              </p>
-            )}
-            {errors?.fixed && (
-              <p className="text-danger text-xs font-semibold">
-                {errors.fixed.message}
-              </p>
-            )}
-
-            <div className="flex gap-4">
-              <div className="flex items-center gap-4">
-                <Label htmlFor="amount" className="text-right">
-                  Amount
-                </Label>
-                <Input {...register("amount", { valueAsNumber: true })} />
-              </div>
-
-              <div className="flex items-center gap-4">
-                <Label htmlFor="plots" className="text-right">
-                  Plots
-                </Label>
-                <Input {...register("plots", { valueAsNumber: true })} />
-              </div>
-
-              <div className="flex items-center gap-4">
-                <Label htmlFor="date" className="text-right">
-                  Date
-                </Label>
-                <Input
-                  type="date"
-                  {...register("date", { valueAsDate: true })}
-                />
-              </div>
             </div>
 
             {errors?.amount && (

@@ -11,7 +11,6 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import Expense from "./types/Expense";
 import { ChartConfig } from "@/components/ui/chart";
 import CardChart from "@/components/CardChart/CardChart";
-import FinansTable from "@/components/FinansTable/FinansTable";
 import {
   Card,
   CardContent,
@@ -19,28 +18,40 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { EvolutionChart } from "@/components/Chart/evolution-chart";
+import {
+  EvolutionChart,
+  IBarChartConfig,
+} from "@/components/Chart/evolution-chart";
 import { ExpensesDialog } from "./expense-dialog";
 import { DatePickerWithRange } from "@/components/date-range-picker";
 import MonthExpense from "./types/MonthExpense";
 import { DateRange } from "react-day-picker";
 import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";
+import { columns } from "./types/columns";
+import { DataTable } from "@/components/DataTable/data-table";
 
-const chartConfig = {
-  total: {
-    label: "Total",
-    color: "#2563eb",
-  },
-} satisfies ChartConfig;
+const barChartConfig: IBarChartConfig = {
+  barsProps: [{ name: "total" }],
+  templateConfig: {
+    total: {
+      label: "Total",
+      color: "#2563eb",
+    },
+  } satisfies ChartConfig,
+};
 
 export default function Expenses() {
   const { accountId } = useContext(AppContext);
+  const [currentDateRange, setCurrentDateRange] = useState<DateRange>();
+
   const [evolutionExpenses, setEvolutionExpenses] = useState<
     GetEvolutionExpensesResponse[]
   >([]);
   const [monthsExpenses, setMonthsExpenses] = useState<MonthExpense[]>([]);
 
   const getExpensesMonths = useCallback((dateRange?: DateRange) => {
+    setCurrentDateRange(dateRange);
+
     getExpensesGetEvolutionExpenses({
       AccountId: accountId ?? -1,
       StartDate: dateRange?.from,
@@ -90,9 +101,7 @@ export default function Expenses() {
         />
         <ExpensesDialog
           accountId={accountId!}
-          onCloseDialog={(infos: any) => {
-            // TODO: Update after closing
-          }}
+          onCloseDialog={() => getExpensesMonths(currentDateRange)}
         />
       </div>
 
@@ -101,16 +110,13 @@ export default function Expenses() {
           return (
             monthExpense.expenses && (
               <CardChart
+                key={`${monthExpense.month}-${monthExpense.year}`}
                 title={`${getMonthDescriptionByNumber(
                   monthExpense.month
                 )} Expenses`}
                 description=""
               >
-                <FinansTable
-                  caption="A list of your current expenses"
-                  data={monthExpense.expenses}
-                  delete={deleteExpense}
-                />
+                <DataTable columns={columns} data={monthExpense.expenses} />
               </CardChart>
             )
           );
@@ -127,8 +133,7 @@ export default function Expenses() {
           <CardContent>
             <EvolutionChart
               data={evolutionExpenses}
-              barTemplateConfig={chartConfig}
-              barPropertyName="total"
+              barChartConfig={barChartConfig}
             />
           </CardContent>
         </Card>

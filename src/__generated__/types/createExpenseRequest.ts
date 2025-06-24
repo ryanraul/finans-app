@@ -8,7 +8,7 @@
 export interface CreateExpenseRequest {
   description: string;
   amount: number;
-  date: string;
+  date: Date;
   fixed: boolean;
   plots: number;
   accountId: number;

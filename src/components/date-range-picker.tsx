@@ -43,14 +43,11 @@ export function DatePickerWithRange({
       to: new Date(dateObject.to),
     };
 
-    console.log(`dateRangeConverted ==> `, dateRangeConverted);
-
     setDate(dateRangeConverted);
     onChangeDates(dateRangeConverted);
   }, []);
 
   function saveDateRange(dateRange?: DateRange) {
-    console.log("ta batendo aqui??");
     setDate(dateRange);
 
     if (keyForLocalStorage && dateRange)

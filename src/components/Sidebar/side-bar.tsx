@@ -1,4 +1,11 @@
-import { Home, Banknote, Receipt, ChartCandlestick } from "lucide-react";
+import {
+  Home,
+  Banknote,
+  Receipt,
+  ChartCandlestick,
+  User2,
+  ChevronUp,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -11,6 +18,12 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 interface IAppSideBarProps {
   logout: () => void;
@@ -63,12 +76,32 @@ export function AppSidebar(appSideBarProps: IAppSideBarProps) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <Button
+            {/* <Button
               className="bg-red-500 hover:bg-red-800"
               onClick={appSideBarProps.logout}
             >
               Logout
-            </Button>
+            </Button> */}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton>
+                  <User2 /> Username
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-[--radix-popper-anchor-width]"
+              >
+                <DropdownMenuItem
+                  className="hover:bg-red-800"
+                  onClick={appSideBarProps.logout}
+                >
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

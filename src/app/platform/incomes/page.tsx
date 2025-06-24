@@ -1,8 +1,10 @@
 "use client";
 
 import CardChart from "@/components/CardChart/CardChart";
-import { EvolutionChart } from "@/components/Chart/evolution-chart";
-import FinansTable from "@/components/FinansTable/FinansTable";
+import {
+  EvolutionChart,
+  IBarChartConfig,
+} from "@/components/Chart/evolution-chart";
 import {
   Card,
   CardContent,
@@ -26,13 +28,18 @@ import { DateRange } from "react-day-picker";
 import MonthIncome from "./types/MonthIncome";
 import { DatePickerWithRange } from "@/components/date-range-picker";
 import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";
+import { DataTable } from "@/components/DataTable/data-table";
+import { columns } from "./types/columns";
 
-const chartConfig = {
-  total: {
-    label: "Total",
-    color: "#2563eb",
-  },
-} satisfies ChartConfig;
+const barChartConfig: IBarChartConfig = {
+  barsProps: [{ name: "total" }],
+  templateConfig: {
+    total: {
+      label: "Total",
+      color: "#2563eb",
+    },
+  } satisfies ChartConfig,
+};
 
 export default function Incomes() {
   const { accountId } = useContext(AppContext);
@@ -98,20 +105,17 @@ export default function Incomes() {
         />
       </div>
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {monthsIncomes.map((monthExpense) => {
+        {monthsIncomes.map((monthIncome) => {
           return (
-            monthExpense.incomes && (
+            monthIncome.incomes && (
               <CardChart
+                key={`${monthIncome.month}-${monthIncome.year}`}
                 title={`${getMonthDescriptionByNumber(
-                  monthExpense.month
-                )} Expenses`}
+                  monthIncome.month
+                )} Incomes`}
                 description=""
               >
-                <FinansTable
-                  caption="A list of your current expenses"
-                  data={monthExpense.incomes}
-                  delete={deleteIncome}
-                />
+                <DataTable columns={columns} data={monthIncome.incomes} />
               </CardChart>
             )
           );
@@ -128,8 +132,7 @@ export default function Incomes() {
           <CardContent>
             <EvolutionChart
               data={evolutionIncomes}
-              barTemplateConfig={chartConfig}
-              barPropertyName="total"
+              barChartConfig={barChartConfig}
             />
           </CardContent>
         </Card>

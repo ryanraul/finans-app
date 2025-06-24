@@ -9,19 +9,26 @@ import {
 import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
-interface IEvolutionChartProps {
-  data: any[];
-  barPropertyName: string;
-  barTemplateConfig: ChartConfig;
+interface IBarProps {
+  name: string;
 }
 
-export function EvolutionChart({
-  data,
-  barPropertyName,
-  barTemplateConfig,
-}: IEvolutionChartProps) {
+export interface IBarChartConfig {
+  barsProps: IBarProps[];
+  templateConfig: ChartConfig;
+}
+
+interface IEvolutionChartProps {
+  data: any[];
+  barChartConfig: IBarChartConfig;
+}
+
+export function EvolutionChart({ data, barChartConfig }: IEvolutionChartProps) {
   return (
-    <ChartContainer config={barTemplateConfig} className="h-[200px] w-full">
+    <ChartContainer
+      config={barChartConfig.templateConfig}
+      className="h-[200px] w-full"
+    >
       <BarChart accessibilityLayer data={data}>
         <CartesianGrid vertical={false} />
         <XAxis
@@ -33,11 +40,19 @@ export function EvolutionChart({
         />
         <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
-        <Bar
+        {barChartConfig.barsProps.map((bar) => (
+          <Bar
+            key={bar.name}
+            dataKey={bar.name}
+            fill={`var(--color-${bar.name})`}
+            radius={4}
+          />
+        ))}
+        {/* <Bar
           dataKey={barPropertyName}
           fill={`var(--color-${barPropertyName})`}
           radius={4}
-        />
+        /> */}
       </BarChart>
     </ChartContainer>
   );

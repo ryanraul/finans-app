@@ -8,6 +8,7 @@ import type {
   CreateAccountRequest,
   CreateExpenseRequest,
   CreateIncomeRequest,
+  GetBalanceParams,
   GetEvolutionExpensesResponse,
   GetEvolutionIncomesResponse,
   GetExpenseByIdResponse,
@@ -22,6 +23,7 @@ import type {
   LoginRefreshTokenRequest,
   LoginRequest,
   LoginResponse,
+  MonthBalanceResponse,
   SignUpRequest,
   SignUpResponse,
   UpdateExpenseRequest,
@@ -264,6 +266,19 @@ export const userProfile = (
       options);
     }
   
+/**
+ * @summary Gets the month balance
+ */
+export const getBalance = (
+    params: GetBalanceParams,
+ options?: SecondParameter<typeof customInstance>,) => {
+      return customInstance<MonthBalanceResponse>(
+      {url: `/balance`, method: 'GET',
+        params
+    },
+      options);
+    }
+  
 export type PostAuthSignupResult = NonNullable<Awaited<ReturnType<typeof postAuthSignup>>>
 export type PostAuthLoginResult = NonNullable<Awaited<ReturnType<typeof postAuthLogin>>>
 export type PostAuthRefreshTokenResult = NonNullable<Awaited<ReturnType<typeof postAuthRefreshToken>>>
@@ -282,3 +297,4 @@ export type GetExpensesIdResult = NonNullable<Awaited<ReturnType<typeof getExpen
 export type DeleteExpensesIdResult = NonNullable<Awaited<ReturnType<typeof deleteExpensesId>>>
 export type GetExpensesGetEvolutionExpensesResult = NonNullable<Awaited<ReturnType<typeof getExpensesGetEvolutionExpenses>>>
 export type UserProfileResult = NonNullable<Awaited<ReturnType<typeof userProfile>>>
+export type GetBalanceResult = NonNullable<Awaited<ReturnType<typeof getBalance>>>

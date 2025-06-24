@@ -1,9 +1,6 @@
-import { GetIncomesResponse, IncomeResponse } from "@/__generated__/types";
-import { TableHeaderProps } from "./TableHeaderProps";
+import { IncomeResponse } from "@/__generated__/types";
 
-export default class Income
-  implements IncomeResponse, TableType<IncomeResponse>
-{
+export default class Income implements IncomeResponse {
   constructor(iIncome?: IncomeResponse);
   constructor(
     idOrIincome?: IncomeResponse,
@@ -24,37 +21,5 @@ export default class Income
     if (iIncome) {
       Object.assign(this, iIncome);
     }
-  }
-
-  getHeaders() {
-    const headers: TableHeaderProps[] = [];
-
-    headers.push(
-      { key: "description", description: "Description" },
-      { key: "amount", description: "Amount" }
-    );
-
-    // properties.forEach((p) => {
-    //   if (p == "id" || p == "date" || p == "fixed") return;
-    //   headers.push({ key: p });
-    // });
-
-    return headers;
-  }
-
-  getCalculableHeaders() {
-    const properties = Object.getOwnPropertyNames(this);
-    const calculableHeaders: string[] = [];
-
-    properties.forEach((p) => {
-      if (p !== "amount") return;
-      calculableHeaders.push(p);
-    });
-
-    return calculableHeaders;
-  }
-
-  getValueByHeader(header: keyof Income) {
-    return this[header];
   }
 }
