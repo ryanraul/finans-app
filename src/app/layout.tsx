@@ -1,6 +1,7 @@
 import AppProvider from "@/contexts/AppContext";
 import "./globals.css";
 import React from "react";
+import { ThemeProvider } from "next-themes";
 
 export default function RootLayout({
   children,
@@ -8,7 +9,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         <link
           rel="stylesheet"
@@ -17,9 +18,16 @@ export default function RootLayout({
           crossOrigin="anonymous"
           referrerPolicy="no-referrer"
         />
-        <React.StrictMode>
-          <AppProvider>{children}</AppProvider>
-        </React.StrictMode>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <React.StrictMode>
+            <AppProvider>{children}</AppProvider>
+          </React.StrictMode>
+        </ThemeProvider>
       </body>
     </html>
   );
