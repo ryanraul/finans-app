@@ -54,7 +54,7 @@ const items = [
 
 export function AppSidebar(appSideBarProps: IAppSideBarProps) {
   return (
-    <Sidebar className="bg-primary">
+    <Sidebar>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -76,13 +76,6 @@ export function AppSidebar(appSideBarProps: IAppSideBarProps) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            {/* <Button
-              className="bg-red-500 hover:bg-red-800"
-              onClick={appSideBarProps.logout}
-            >
-              Logout
-            </Button> */}
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
@@ -92,7 +85,7 @@ export function AppSidebar(appSideBarProps: IAppSideBarProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 side="top"
-                className="w-[--radix-popper-anchor-width]"
+                className="w-(--radix-popper-anchor-width)"
               >
                 <DropdownMenuItem
                   className="hover:bg-red-800"

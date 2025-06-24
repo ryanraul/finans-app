@@ -1,7 +1,7 @@
 "use client";
 
 import CardChart from "@/components/CardChart/CardChart";
-import { DatePickerWithRange } from "@/components/date-range-picker";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";
 import { useContext, useEffect, useState } from "react";
 import MonthExpense from "./expenses/types/MonthExpense";

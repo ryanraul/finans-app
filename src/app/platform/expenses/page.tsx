@@ -23,7 +23,7 @@ import {
   IBarChartConfig,
 } from "@/components/Chart/evolution-chart";
 import { ExpensesDialog } from "./expense-dialog";
-import { DatePickerWithRange } from "@/components/date-range-picker";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import MonthExpense from "./types/MonthExpense";
 import { DateRange } from "react-day-picker";
 import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";

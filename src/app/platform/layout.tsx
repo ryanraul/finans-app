@@ -26,10 +26,10 @@ export default function LayoutPlatform(
       <SidebarProvider defaultOpen={true}>
         <AppSidebar logout={disconnectUser} />
         <main className="flex flex-col w-full">
-          <header className="flex flex-row  grow-[3] w-full">
+          <header className="flex flex-row  grow-3 w-full">
             <SidebarTrigger className="sm:hidden" />
           </header>
-          <section className="flex grow-[9]">
+          <section className="flex grow-9">
             {layoutPlatformProps.children}
           </section>
         </main>

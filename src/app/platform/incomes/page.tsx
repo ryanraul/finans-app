@@ -26,7 +26,7 @@ import { ChartConfig } from "@/components/ui/chart";
 import { AppContext } from "@/contexts/AppContext";
 import { DateRange } from "react-day-picker";
 import MonthIncome from "./types/MonthIncome";
-import { DatePickerWithRange } from "@/components/date-range-picker";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";
 import { DataTable } from "@/components/DataTable/data-table";
 import { columns } from "./types/columns";
