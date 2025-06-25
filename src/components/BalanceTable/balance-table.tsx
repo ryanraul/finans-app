@@ -25,7 +25,7 @@ export default function BalanceTable(balanceTableProps: BalanceTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody style={{ fontWeight: "bold" }}>
-        <TableRow style={{ color: "#2563eb" }}>
+        <TableRow>
           <TableCell>
             <Landmark className="inline mr-1 " />
             Account Balance
@@ -33,7 +33,7 @@ export default function BalanceTable(balanceTableProps: BalanceTableProps) {
           <TableCell> {monthBalance?.accountBalance.toFixed(2)}</TableCell>
         </TableRow>
 
-        <TableRow style={{ color: "#228B22" }}>
+        <TableRow>
           <TableCell>
             <TrendingUp className="inline mr-1 " />
             Incomes
@@ -41,7 +41,7 @@ export default function BalanceTable(balanceTableProps: BalanceTableProps) {
           <TableCell> {monthBalance?.totalIncomes.toFixed(2)}</TableCell>
         </TableRow>
 
-        <TableRow style={{ color: "#cc0002" }}>
+        <TableRow>
           <TableCell>
             <MoveDownRight className="inline mr-1 " />
             Expenses

@@ -5,6 +5,8 @@ import {
   ChartCandlestick,
   User2,
   ChevronUp,
+  Lightbulb,
+  LightbulbOff,
 } from "lucide-react";
 
 import {
@@ -24,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useTheme } from "next-themes";
 
 interface IAppSideBarProps {
   logout: () => void;
@@ -53,6 +56,8 @@ const items = [
 ];
 
 export function AppSidebar(appSideBarProps: IAppSideBarProps) {
+  const { theme, setTheme } = useTheme();
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -88,9 +93,14 @@ export function AppSidebar(appSideBarProps: IAppSideBarProps) {
                 className="w-(--radix-popper-anchor-width)"
               >
                 <DropdownMenuItem
-                  className="hover:bg-red-800"
-                  onClick={appSideBarProps.logout}
+                  onClick={() => {
+                    setTheme(theme === "light" ? "dark" : "light");
+                  }}
                 >
+                  {theme === "light" ? <LightbulbOff /> : <Lightbulb />}
+                  Theme
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={appSideBarProps.logout}>
                   Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>

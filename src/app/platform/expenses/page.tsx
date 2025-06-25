@@ -35,7 +35,7 @@ const barChartConfig: IBarChartConfig = {
   templateConfig: {
     total: {
       label: "Total",
-      color: "#2563eb",
+      color: "var(--chart-1)",
     },
   } satisfies ChartConfig,
 };

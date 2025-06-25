@@ -38,11 +38,11 @@ const barChartConfig: IBarChartConfig = {
   templateConfig: {
     expenses: {
       label: "Expenses",
-      color: "#2563eb",
+      color: "var(--chart-1)",
     },
     incomes: {
       label: "Incomes",
-      color: "#9f63eb",
+      color: "var(--chart-2)",
     },
   } satisfies ChartConfig,
 };
