@@ -1,14 +1,7 @@
-import axios, { AxiosHeaders, AxiosInstance, AxiosRequestHeaders } from "axios";
-import ApiResponse from "./ApiResponse";
-import RefreshTokenDto from "./RefreshTokenDto";
+import axios, { AxiosHeaders, AxiosRequestHeaders } from "axios";
 
 export class FinansAxiosApi {
-  constructor() {
-    FinansAxiosApi.updateConnectionData();
-  }
-
   static jwtBearerToken = "";
-  static clientHttp: AxiosInstance;
 
   static setTokenJwt(token: string) {
     this.jwtBearerToken = `Bearer ${token}`;
@@ -26,35 +19,7 @@ export class FinansAxiosApi {
       withCredentials: true,
     });
 
-    axiosInstance.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-        if (error.response.status === 401 && !originalRequest._retry) {
-          try {
-            const response = await this.get<RefreshTokenDto>(
-              "/auth/refreshToken"
-            );
-
-            this.setTokenJwt(response.Data?.accessToken!);
-            originalRequest.headers.Authorization = `Bearer ${response.Data?.accessToken}`;
-            originalRequest._retry = true;
-
-            return axiosInstance(originalRequest);
-          } catch {
-            console.log(`Error interceptor`);
-          }
-        }
-
-        return Promise.reject(error);
-      }
-    );
-
     return axiosInstance;
-  }
-
-  static updateConnectionData() {
-    this.clientHttp = FinansAxiosApi.getAxiosInstance();
   }
 
   static getRequestHeaders(): AxiosRequestHeaders {
@@ -62,41 +27,5 @@ export class FinansAxiosApi {
       Accept: "application/json",
       Authorization: this.jwtBearerToken,
     });
-  }
-
-  static getErrorResponse(error: any) {
-    if (!error.response && error.message) {
-      if (error.message.includes("Network Error"))
-        return new ApiResponse<undefined>("Network problems...", 0, undefined);
-
-      if (error.message.includes("timeout"))
-        return new ApiResponse<undefined>("Timeout error", 0, undefined);
-    }
-
-    return new ApiResponse<undefined>("Api Failed", 0, undefined);
-  }
-
-  static async post<T>(url: string, data: any) {
-    const axiosInstance = this.clientHttp;
-
-    return axiosInstance
-      .post(url, data, {
-        headers: FinansAxiosApi.getRequestHeaders(),
-      })
-      .then((response) => {
-        return new ApiResponse<T>("", 200, response.data);
-      })
-      .catch((error) => {
-        return FinansAxiosApi.getErrorResponse(error);
-      });
-  }
-
-  static async get<T>(url: string) {
-    return FinansAxiosApi.clientHttp
-      .get(url, {
-        headers: this.getRequestHeaders(),
-      })
-      .then((response) => new ApiResponse<T>("", 200, response.data))
-      .catch((error) => FinansAxiosApi.getErrorResponse(error));
   }
 }

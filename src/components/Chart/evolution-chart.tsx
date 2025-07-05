@@ -1,5 +1,3 @@
-"use client";
-
 import {
   ChartConfig,
   ChartContainer,
@@ -8,39 +6,53 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-];
+interface IBarProps {
+  name: string;
+}
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "#2563eb",
-  },
-} satisfies ChartConfig;
+export interface IBarChartConfig {
+  barsProps: IBarProps[];
+  templateConfig: ChartConfig;
+}
 
-export function EvolutionChart() {
+interface IEvolutionChartProps {
+  data: any[];
+  barChartConfig: IBarChartConfig;
+}
+
+export function EvolutionChart({ data, barChartConfig }: IEvolutionChartProps) {
   return (
-    <ChartContainer config={chartConfig} className="h-[200px] w-full">
-      <BarChart accessibilityLayer data={chartData}>
+    <ChartContainer
+      config={barChartConfig.templateConfig}
+      className="h-[200px] w-full bg-gradient-to-t"
+    >
+      <BarChart accessibilityLayer data={data}>
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey="month"
           tickLine={false}
           tickMargin={10}
           axisLine={false}
-          tickFormatter={(value) => value.slice(0, 3)}
+          tickFormatter={(value) => getMonthDescriptionByNumber(value)}
         />
         <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
-        <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+        {barChartConfig.barsProps.map((bar) => (
+          <Bar
+            key={bar.name}
+            dataKey={bar.name}
+            fill={`var(--color-${bar.name})`}
+            radius={4}
+          />
+        ))}
+        {/* <Bar
+          dataKey={barPropertyName}
+          fill={`var(--color-${barPropertyName})`}
+          radius={4}
+        /> */}
       </BarChart>
     </ChartContainer>
   );

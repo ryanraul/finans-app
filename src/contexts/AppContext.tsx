@@ -1,15 +1,20 @@
 "use client";
 
-import { userLogout } from "@/app/(pages)/auth/api/logout.api";
-import { User } from "@/app/(pages)/auth/types/User";
+import { postAuthRefreshToken } from "@/__generated__/api";
+import { userLogout } from "@/app/auth/api/logout.api";
+import { User } from "@/app/auth/types/User";
 import { FinansAxiosApi } from "@/services/FinansAxiosApi";
 import { redirect } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
+import Cookies from "universal-cookie";
 
 interface IAppContext {
   user: User | undefined;
+  accountId: number | undefined;
+  isSessionLoading: boolean;
   setUser: (user: User | undefined) => void;
   disconnectUser: () => void;
+  setAccountId: (accountId: number) => void;
 }
 
 export const AppContext = createContext({} as IAppContext);
@@ -20,19 +25,29 @@ export function useAuth() {
 
 const AppProvider = ({ children }: any) => {
   const [user, setUser] = useState<User | undefined>(undefined);
-  //TODO - Implement accordion with account ids on the side bar
   const [accountId, setAccountId] = useState<number>();
-  const _ = new FinansAxiosApi();
+  const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    FinansAxiosApi.get<{ username: string }>("/user/profile").then(
-      (response) => {
-        if (response.Data?.username) {
-          const userResponse = new User(response.Data?.username);
-          setUser(userResponse);
-        }
-      }
-    );
+    const cookies = new Cookies();
+    const token = cookies.get("refreshToken");
+
+    if (!token) {
+      setIsSessionLoading(false);
+      return;
+    }
+
+    setIsSessionLoading(true);
+
+    postAuthRefreshToken({ refreshToken: token }).then((response) => {
+      FinansAxiosApi.setTokenJwt(response.token);
+      setUser(
+        new User(response.userResponse.username, response.userResponse.accounts)
+      );
+      setAccountId(response.userResponse.accounts[0].id);
+
+      setIsSessionLoading(false);
+    });
   }, []);
 
   async function disconnectUser() {
@@ -45,8 +60,11 @@ const AppProvider = ({ children }: any) => {
     <AppContext.Provider
       value={{
         user,
+        accountId,
+        isSessionLoading,
         setUser,
         disconnectUser,
+        setAccountId,
       }}
     >
       {children}
