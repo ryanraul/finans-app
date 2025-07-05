@@ -1,4 +1,4 @@
-import { ExpenseResponse } from "@/__generated__/types";
+import { ExpenseResponse, PlotResponse } from "@/__generated__/types";
 
 export default class Expense implements ExpenseResponse {
   constructor(IExpense?: ExpenseResponse);
@@ -9,7 +9,7 @@ export default class Expense implements ExpenseResponse {
     amount?: number,
     fixed?: boolean,
     date?: Date,
-    plots?: number
+    plots?: PlotResponse
   );
   constructor(
     IExpense?: ExpenseResponse,
@@ -18,7 +18,7 @@ export default class Expense implements ExpenseResponse {
     public amount?: number,
     public fixed?: boolean,
     public date?: Date,
-    public plots?: number
+    public plots?: PlotResponse
   ) {
     if (IExpense) {
       Object.assign(this, IExpense);

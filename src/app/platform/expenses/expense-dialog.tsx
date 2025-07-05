@@ -3,18 +3,34 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { CreateExpenseRequest } from "@/__generated__/types";
 import { postExpenses } from "@/__generated__/api";
 import { z } from "zod";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import InputCurrency from "@/components/InputCurrency/input-currency";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon, Plus } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const expenseSchema = z.object({
@@ -36,13 +52,7 @@ export function ExpensesDialog({
   onCloseDialog,
   accountId,
 }: IExpenseDialogProps) {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    control,
-    formState: { errors },
-  } = useForm<ExpenseSchema>({
+  const form = useForm<ExpenseSchema>({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
       description: "",
@@ -71,7 +81,8 @@ export function ExpensesDialog({
 
     await postExpenses(request);
 
-    reset();
+    form.reset();
+    onCloseDialog(); // Close dialog after successful submission
   }
 
   return (
@@ -82,7 +93,7 @@ export function ExpensesDialog({
     >
       <DialogTrigger asChild>
         <Button variant="outline">
-          <i className="fa-solid fa-plus "></i> Add Expense
+          <Plus /> Add Expense
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[595px]">
@@ -90,91 +101,128 @@ export function ExpensesDialog({
           <DialogTitle>Add Expense</DialogTitle>
           <DialogDescription>Add here your expense.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(createExpense)}>
-          <div className="grid gap-4 py-4">
-            <div className="flex items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Description
-              </Label>
-              <Input type="text" {...register("description")} />
 
-              <Label htmlFor="amount" className="text-right">
-                Amount
-              </Label>
-              <Input {...register("amount", { valueAsNumber: true })} />
-            </div>
-
-            {errors?.description && (
-              <p className="text-danger text-xs font-semibold">
-                {errors.description.message}
-              </p>
-            )}
-            {errors?.fixed && (
-              <p className="text-danger text-xs font-semibold">
-                {errors.fixed.message}
-              </p>
-            )}
-
-            <div className="flex gap-4">
-              <div className="flex items-center gap-4">
-                <Label htmlFor="plots" className="text-right">
-                  Plots
-                </Label>
-                <Input {...register("plots", { valueAsNumber: true })} />
-              </div>
-
-              <div className="flex items-center gap-4">
-                <Label htmlFor="date" className="text-right">
-                  Date
-                </Label>
-                <Input
-                  type="date"
-                  {...register("date", { valueAsDate: true })}
-                />
-              </div>
-
-              <Controller
-                name="fixed"
-                control={control}
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(createExpense)}
+            className="flex flex-col gap-3"
+          >
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex flex-row  gap-4">
+              <FormField
+                control={form.control}
+                name="amount"
                 render={({ field }) => (
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="fixed"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                    <label
-                      htmlFor="fixed"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Fixed?
-                    </label>
-                  </div>
+                  <FormItem className="w-full">
+                    <FormLabel>Amount</FormLabel>
+                    <FormControl>
+                      <InputCurrency {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="plots"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Plots</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value) || 0)
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
             </div>
 
-            {errors?.amount && (
-              <p className="text-danger text-xs font-semibold">
-                {errors.amount.message}
-              </p>
-            )}
-            {errors?.plots && (
-              <p className="text-danger text-xs font-semibold">
-                {errors.plots.message}
-              </p>
-            )}
-            {errors?.date && (
-              <p className="text-danger text-xs font-semibold">
-                {errors.date.message}
-              </p>
-            )}
-          </div>
+            <div className="flex flex-row items-center gap-4">
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          captionLayout="dropdown"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <DialogFooter>
-            <Button type="submit">Save changes</Button>
-          </DialogFooter>
-        </form>
+              <FormField
+                control={form.control}
+                name="fixed"
+                render={({ field }) => {
+                  return (
+                    <FormItem className="flex flex-row  gap-2">
+                      <FormControl className="flex space-x-2">
+                        <Checkbox
+                          id="fixed"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel className="text-sm font-normal">
+                        Fixed?
+                      </FormLabel>
+                    </FormItem>
+                  );
+                }}
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <Button type="submit">Save changes</Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

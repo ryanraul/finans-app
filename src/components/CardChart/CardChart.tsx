@@ -14,7 +14,7 @@ interface ICardChartProps {
 
 export default function CardChart(cardChart: ICardChartProps) {
   return (
-    <Card className="max-w-2xl">
+    <Card className="max-w-2xl bg-gradient-to-t">
       <CardHeader>
         <div className="flex items-center justify-center">
           <CardTitle>{cardChart.title}</CardTitle>

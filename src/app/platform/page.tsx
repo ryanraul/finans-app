@@ -30,8 +30,8 @@ import {
   MonthBalanceResponse,
 } from "@/__generated__/types";
 import { DataTable } from "@/components/DataTable/data-table";
-import { columns } from "./expenses/types/columns";
-import BalanceTable from "@/components/BalanceTable/balance-table";
+import BalanceCards from "./balance-cards";
+import { getExpenseColumns } from "./expenses/types/columns";
 
 const barChartConfig: IBarChartConfig = {
   barsProps: [{ name: "incomes" }, { name: "expenses" }],
@@ -136,13 +136,18 @@ export default function Plataform() {
         />
       </div>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <BalanceCards monthBalance={monthBalance} />
+
+      <section className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 *:data-[slot=card]:from-primary/4 ">
         <CardChart
           key={`${monthExpense?.month}-${monthExpense?.year}`}
           title={`${getMonthDescriptionByNumber(monthExpense?.month)} Expenses`}
           description=""
         >
-          <DataTable columns={columns} data={monthExpense?.expenses ?? []} />
+          <DataTable
+            columns={getExpenseColumns()}
+            data={monthExpense?.expenses ?? []}
+          />
           <h2>
             Total:{" "}
             {monthExpense?.expenses
@@ -150,22 +155,7 @@ export default function Plataform() {
               .toFixed(2)}
           </h2>
         </CardChart>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-center">
-              <CardTitle>Month Balance</CardTitle>
-            </div>
-          </CardHeader>
-          <CardDescription></CardDescription>
-          <CardContent>
-            <BalanceTable balance={monthBalance}></BalanceTable>
-          </CardContent>
-        </Card>
-      </section>
-
-      <section className="mt-10">
-        <Card>
+        <Card className="bg-gradient-to-t">
           <CardHeader>
             <div className="flex items-center justify-center">
               <CardTitle>Evolution Expenses</CardTitle>

@@ -27,7 +27,7 @@ export function EvolutionChart({ data, barChartConfig }: IEvolutionChartProps) {
   return (
     <ChartContainer
       config={barChartConfig.templateConfig}
-      className="h-[200px] w-full"
+      className="h-[200px] w-full bg-gradient-to-t"
     >
       <BarChart accessibilityLayer data={data}>
         <CartesianGrid vertical={false} />

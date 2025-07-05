@@ -7,7 +7,7 @@ import {
 } from "@/__generated__/api";
 import { GetEvolutionExpensesResponse } from "@/__generated__/types";
 import { AppContext } from "@/contexts/AppContext";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import Expense from "./types/Expense";
 import { ChartConfig } from "@/components/ui/chart";
 import CardChart from "@/components/CardChart/CardChart";
@@ -27,8 +27,8 @@ import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import MonthExpense from "./types/MonthExpense";
 import { DateRange } from "react-day-picker";
 import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";
-import { columns } from "./types/columns";
 import { DataTable } from "@/components/DataTable/data-table";
+import { getExpenseColumns } from "./types/columns";
 
 const barChartConfig: IBarChartConfig = {
   barsProps: [{ name: "total" }],
@@ -105,7 +105,7 @@ export default function Expenses() {
         />
       </div>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 *:data-[slot=card]:from-primary/4">
         {monthsExpenses.map((monthExpense) => {
           return (
             monthExpense.expenses && (
@@ -116,13 +116,16 @@ export default function Expenses() {
                 )} Expenses`}
                 description=""
               >
-                <DataTable columns={columns} data={monthExpense.expenses} />
+                <DataTable
+                  columns={getExpenseColumns(deleteExpense, undefined)}
+                  data={monthExpense.expenses}
+                />
               </CardChart>
             )
           );
         })}
       </section>
-      <section className="mt-10">
+      <section className="mt-10 *:data-[slot=card]:from-primary/4">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-center">

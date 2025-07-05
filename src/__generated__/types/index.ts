@@ -32,6 +32,7 @@ export * from './loginResponse';
 export * from './monthBalanceResponse';
 export * from './pagedListOfGetExpensesResponse';
 export * from './pagedListOfGetIncomesResponse';
+export * from './plotResponse';
 export * from './signUpRequest';
 export * from './signUpResponse';
 export * from './updateExpenseRequest';
