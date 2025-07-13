@@ -15,11 +15,11 @@ import {
 
 import Income from "./types/Income";
 import { useCallback, useContext, useState } from "react";
-import { IncomesDialog } from "@/components/IncomeDialog/IncomeDialog";
 import {
   deleteIncomesId,
   getIncomes,
   getIncomesGetevolutionincomes,
+  putIncomes,
 } from "@/__generated__/api";
 import { GetEvolutionIncomesResponse } from "@/__generated__/types";
 import { ChartConfig } from "@/components/ui/chart";
@@ -29,7 +29,8 @@ import MonthIncome from "./types/MonthIncome";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { getMonthDescriptionByNumber } from "@/utils/DateExtensions";
 import { DataTable } from "@/components/DataTable/data-table";
-import { columns } from "./types/columns";
+import { IncomesDialog } from "./income-dialog";
+import { getIncomeColumns } from "./types/columns";
 
 const barChartConfig: IBarChartConfig = {
   barsProps: [{ name: "total" }],
@@ -43,6 +44,10 @@ const barChartConfig: IBarChartConfig = {
 
 export default function Incomes() {
   const { accountId } = useContext(AppContext);
+  const [currentDateRange, setCurrentDateRange] = useState<DateRange>();
+  const [updateIncome, setUpdateIncome] = useState<Income | undefined>(
+    undefined
+  );
 
   const [evolutionIncomes, setEvolutionIncomes] = useState<
     GetEvolutionIncomesResponse[]
@@ -50,6 +55,8 @@ export default function Incomes() {
   const [monthsIncomes, setMonthsIncomes] = useState<MonthIncome[]>([]);
 
   const getIncomesMonths = useCallback((dateRange?: DateRange) => {
+    setCurrentDateRange(dateRange);
+
     getIncomesGetevolutionincomes({
       AccountId: accountId ?? -1,
       StartDate: dateRange?.from,
@@ -90,6 +97,11 @@ export default function Incomes() {
     );
   }
 
+  function editIncome(income: Income) {
+    console.log(income);
+    setUpdateIncome(income);
+  }
+
   return (
     <main className="sm:ml-14 w-full p-4 ">
       <div className="flex justify-end mb-4">
@@ -99,12 +111,14 @@ export default function Incomes() {
         />
         <IncomesDialog
           accountId={accountId!}
-          onCloseDialog={(infos: any) => {
-            // TODO: Update after closing
+          onCloseDialog={() => {
+            getIncomesMonths(currentDateRange);
+            setUpdateIncome(undefined);
           }}
+          income={updateIncome}
         />
       </div>
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {monthsIncomes.map((monthIncome) => {
           return (
             monthIncome.incomes && (
@@ -115,7 +129,10 @@ export default function Incomes() {
                 )} Incomes`}
                 description=""
               >
-                <DataTable columns={columns} data={monthIncome.incomes} />
+                <DataTable
+                  columns={getIncomeColumns(deleteIncome, editIncome)}
+                  data={monthIncome.incomes}
+                />
               </CardChart>
             )
           );

@@ -117,7 +117,7 @@ export default function Expenses() {
                 description=""
               >
                 <DataTable
-                  columns={getExpenseColumns(deleteExpense, undefined)}
+                  columns={getExpenseColumns(deleteExpense)}
                   data={monthExpense.expenses}
                 />
               </CardChart>

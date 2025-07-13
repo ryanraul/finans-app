@@ -10,5 +10,5 @@ export interface UpdateIncomeRequest {
   description: string;
   amount: number;
   fixed: boolean;
-  date: string;
+  date: Date;
 }

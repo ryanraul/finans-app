@@ -9,6 +9,6 @@ export interface CreateIncomeRequest {
   description: string;
   amount: number;
   fixed: boolean;
-  date: string;
+  date: Date;
   accountId: number;
 }
