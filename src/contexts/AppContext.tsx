@@ -4,8 +4,8 @@ import { postAuthRefreshToken } from "@/__generated__/api";
 import { userLogout } from "@/app/auth/api/logout.api";
 import { User } from "@/app/auth/types/User";
 import { FinansAxiosApi } from "@/services/FinansAxiosApi";
-import { redirect } from "next/navigation";
-import { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import Cookies from "universal-cookie";
 
 interface IAppContext {
@@ -27,33 +27,60 @@ const AppProvider = ({ children }: any) => {
   const [user, setUser] = useState<User | undefined>(undefined);
   const [accountId, setAccountId] = useState<number>();
   const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
+  const isInitialized = useRef(false); // Previne execução duplicada
+  const router = useRouter();
 
   useEffect(() => {
-    const cookies = new Cookies();
-    const token = cookies.get("refreshToken");
+    // Previne múltiplas execuções
+    if (isInitialized.current) return;
+    isInitialized.current = true;
 
-    if (!token) {
-      setIsSessionLoading(false);
-      return;
-    }
+    const initializeSession = async () => {
+      try {
+        const cookies = new Cookies();
+        const token = cookies.get("refreshToken");
 
-    setIsSessionLoading(true);
+        if (!token) {
+          setIsSessionLoading(false);
+          return;
+        }
 
-    postAuthRefreshToken({ refreshToken: token }).then((response) => {
-      FinansAxiosApi.setTokenJwt(response.token);
-      setUser(
-        new User(response.userResponse.username, response.userResponse.accounts)
-      );
-      setAccountId(response.userResponse.accounts[0].id);
+        const response = await postAuthRefreshToken({ refreshToken: token });
 
-      setIsSessionLoading(false);
-    });
+        FinansAxiosApi.setTokenJwt(response.token);
+        setUser(
+          new User(
+            response.userResponse.username,
+            response.userResponse.accounts
+          )
+        );
+        setAccountId(response.userResponse.accounts[0]?.id);
+      } catch (error) {
+        console.error("Erro ao renovar sessão:", error);
+        // Limpa cookies inválidos
+        const cookies = new Cookies();
+        cookies.remove("refreshToken", { path: "/" });
+        setUser(undefined);
+      } finally {
+        // CRÍTICO: sempre define loading como false
+        setIsSessionLoading(false);
+      }
+    };
+
+    initializeSession();
   }, []);
 
   async function disconnectUser() {
-    userLogout();
-    setUser(undefined);
-    redirect("/auth");
+    try {
+      await userLogout();
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    } finally {
+      setUser(undefined);
+      setAccountId(undefined);
+      // Use router.push ao invés de redirect
+      router.push("/auth");
+    }
   }
 
   return (

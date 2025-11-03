@@ -43,6 +43,9 @@ const barChartConfig: IBarChartConfig = {
 export default function Expenses() {
   const { accountId } = useContext(AppContext);
   const [currentDateRange, setCurrentDateRange] = useState<DateRange>();
+  const [updateExpense, setUpdateExpense] = useState<Expense | undefined>(
+    undefined
+  );
 
   const [evolutionExpenses, setEvolutionExpenses] = useState<
     GetEvolutionExpensesResponse[]
@@ -92,6 +95,10 @@ export default function Expenses() {
     );
   }
 
+  function editExpense(expense: Expense) {
+    setUpdateExpense(expense);
+  }
+
   return (
     <main className="sm:ml-14 w-full p-4 ">
       <div className="flex justify-end mb-4 gap-3">
@@ -101,7 +108,11 @@ export default function Expenses() {
         />
         <ExpensesDialog
           accountId={accountId!}
-          onCloseDialog={() => getExpensesMonths(currentDateRange)}
+          onCloseDialog={() => {
+            getExpensesMonths(currentDateRange);
+            setUpdateExpense(undefined);
+          }}
+          updateExpense={updateExpense}
         />
       </div>
 
@@ -117,7 +128,7 @@ export default function Expenses() {
                 description=""
               >
                 <DataTable
-                  columns={getExpenseColumns(deleteExpense)}
+                  columns={getExpenseColumns(deleteExpense, editExpense)}
                   data={monthExpense.expenses}
                 />
               </CardChart>

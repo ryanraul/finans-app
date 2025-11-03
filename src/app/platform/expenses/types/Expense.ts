@@ -9,7 +9,8 @@ export default class Expense implements ExpenseResponse {
     amount?: number,
     fixed?: boolean,
     date?: Date,
-    plots?: PlotResponse
+    plots?: PlotResponse,
+    totalPlots?: number
   );
   constructor(
     IExpense?: ExpenseResponse,
@@ -18,7 +19,8 @@ export default class Expense implements ExpenseResponse {
     public amount?: number,
     public fixed?: boolean,
     public date?: Date,
-    public plots?: PlotResponse
+    public plots?: PlotResponse,
+    public totalPlots?: number
   ) {
     if (IExpense) {
       Object.assign(this, IExpense);

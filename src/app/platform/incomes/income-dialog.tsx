@@ -51,22 +51,22 @@ type IncomeSchema = z.infer<typeof incomeSchema>;
 interface IIncomeDialogProps {
   accountId: number;
   onCloseDialog: () => void;
-  income?: Income;
+  updateIncome?: Income;
 }
 
 export function IncomesDialog({
   onCloseDialog,
   accountId,
-  income,
+  updateIncome,
 }: IIncomeDialogProps) {
   const [openDialog, setOpenDialog] = useState(
-    income != undefined ? true : false
+    updateIncome != undefined ? true : false
   );
 
   useEffect(() => {
-    if (!income) return;
+    if (!updateIncome) return;
     setOpenDialog(true);
-  }, [income]);
+  }, [updateIncome]);
 
   const form = useForm<IncomeSchema>({
     resolver: zodResolver(incomeSchema),
@@ -79,12 +79,12 @@ export function IncomesDialog({
   });
 
   useEffect(() => {
-    if (income) {
+    if (updateIncome) {
       form.reset({
-        description: income.description ?? "",
-        amount: income.amount ?? 0,
-        fixed: income.fixed ?? false,
-        date: income.date ? new Date(income.date) : new Date(),
+        description: updateIncome.description ?? "",
+        amount: updateIncome.amount ?? 0,
+        fixed: updateIncome.fixed ?? false,
+        date: updateIncome.date ? new Date(updateIncome.date) : new Date(),
       });
     } else {
       form.reset({
@@ -94,7 +94,7 @@ export function IncomesDialog({
         date: new Date(),
       });
     }
-  }, [income, form]);
+  }, [updateIncome, form]);
 
   async function createIncome({
     description,
@@ -122,10 +122,10 @@ export function IncomesDialog({
     fixed,
     date,
   }: IncomeSchema) {
-    if (!income?.id) return;
+    if (!updateIncome?.id) return;
 
     const request: UpdateIncomeRequest = {
-      id: income.id,
+      id: updateIncome.id,
       description: description,
       amount: amount,
       date: date,
@@ -137,14 +137,13 @@ export function IncomesDialog({
     onCloseDialog();
   }
 
-  const handleSubmit = income ? editIncome : createIncome;
+  const handleSubmit = updateIncome ? editIncome : createIncome;
 
   return (
     <Dialog
       open={openDialog}
       onOpenChange={(open) => {
         setOpenDialog(open);
-        console.log("open ==> ", open);
         if (open) return;
         onCloseDialog();
       }}
@@ -156,11 +155,14 @@ export function IncomesDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[495px]">
         <DialogHeader>
-          <DialogTitle>{income ? "Edit Income" : "Add Income"}</DialogTitle>
+          <DialogTitle>
+            {updateIncome ? "Edit Income" : "Add Income"}
+          </DialogTitle>
           <DialogDescription>
-            {income ? "Edit your income." : "Add here your income."}
+            {updateIncome ? "Edit your income." : "Add here your income."}
           </DialogDescription>
         </DialogHeader>
+
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
@@ -260,7 +262,9 @@ export function IncomesDialog({
 
             <DialogFooter>
               <div className="flex justify-end">
-                <Button type="submit">{income ? "Update" : "Save"}</Button>
+                <Button type="submit">
+                  {updateIncome ? "Update" : "Save"}
+                </Button>
               </div>
             </DialogFooter>
           </form>

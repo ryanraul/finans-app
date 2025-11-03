@@ -4,13 +4,14 @@
  * Finans | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { PlotResponse } from './plotResponse';
+import type { PlotResponse } from "./plotResponse";
 
 export interface ExpenseResponse {
   id: number;
   description: string;
   amount: number;
   fixed: boolean;
-  date: string;
+  date: Date;
   plots: PlotResponse;
+  totalPlots: number;
 }

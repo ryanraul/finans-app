@@ -98,7 +98,6 @@ export default function Incomes() {
   }
 
   function editIncome(income: Income) {
-    console.log(income);
     setUpdateIncome(income);
   }
 
@@ -115,7 +114,7 @@ export default function Incomes() {
             getIncomesMonths(currentDateRange);
             setUpdateIncome(undefined);
           }}
-          income={updateIncome}
+          updateIncome={updateIncome}
         />
       </div>
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">

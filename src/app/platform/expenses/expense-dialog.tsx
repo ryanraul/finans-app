@@ -8,8 +8,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { CreateExpenseRequest } from "@/__generated__/types";
-import { postExpenses } from "@/__generated__/api";
+import {
+  CreateExpenseRequest,
+  UpdateExpenseRequest,
+} from "@/__generated__/types";
+import { postExpenses, putExpenses } from "@/__generated__/api";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +35,8 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import Expense from "./types/Expense";
+import { useEffect, useState } from "react";
 
 const expenseSchema = z.object({
   description: z.string().min(2, "Expense description is mandatory."),
@@ -46,12 +51,23 @@ type ExpenseSchema = z.infer<typeof expenseSchema>;
 interface IExpenseDialogProps {
   accountId: number;
   onCloseDialog: () => void;
+  updateExpense?: Expense;
 }
 
 export function ExpensesDialog({
   onCloseDialog,
   accountId,
+  updateExpense,
 }: IExpenseDialogProps) {
+  const [openDialog, setOpenDialog] = useState(
+    updateExpense != undefined ? true : false
+  );
+
+  useEffect(() => {
+    if (!updateExpense) return;
+    setOpenDialog(true);
+  }, [updateExpense]);
+
   const form = useForm<ExpenseSchema>({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
@@ -62,6 +78,26 @@ export function ExpensesDialog({
       plots: 0,
     },
   });
+
+  useEffect(() => {
+    if (updateExpense) {
+      form.reset({
+        description: updateExpense.description ?? "",
+        amount: updateExpense.amount ?? 0,
+        plots: updateExpense.totalPlots ?? 0,
+        fixed: updateExpense.fixed ?? false,
+        date: updateExpense.date ? new Date(updateExpense.date) : new Date(),
+      });
+    } else {
+      form.reset({
+        description: "",
+        plots: 0,
+        amount: 0,
+        fixed: false,
+        date: new Date(),
+      });
+    }
+  }, [updateExpense, form]);
 
   async function createExpense({
     description,
@@ -85,10 +121,40 @@ export function ExpensesDialog({
     onCloseDialog(); // Close dialog after successful submission
   }
 
+  async function editExpense({
+    description,
+    amount,
+    plots,
+    fixed,
+    date,
+  }: ExpenseSchema) {
+    if (!updateExpense?.id) return;
+
+    const request: UpdateExpenseRequest = {
+      id: updateExpense.id,
+      description: description,
+      amount: amount,
+      plots: plots,
+      date: date,
+      fixed: fixed ?? false,
+    };
+
+    console.log("request => ", request);
+
+    await putExpenses(request);
+    setOpenDialog(false);
+    onCloseDialog();
+  }
+
+  const handleSubmit = updateExpense ? editExpense : createExpense;
+
   return (
     <Dialog
+      open={openDialog}
       onOpenChange={(open) => {
-        if (!open) onCloseDialog();
+        setOpenDialog(open);
+        if (open) return;
+        onCloseDialog();
       }}
     >
       <DialogTrigger asChild>
@@ -98,13 +164,17 @@ export function ExpensesDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[595px]">
         <DialogHeader>
-          <DialogTitle>Add Expense</DialogTitle>
-          <DialogDescription>Add here your expense.</DialogDescription>
+          <DialogTitle>
+            {updateExpense ? "Edit Expense" : "Add Expense"}
+          </DialogTitle>
+          <DialogDescription>
+            {updateExpense ? "Edit your expense." : "Add here your expense."}
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(createExpense)}
+            onSubmit={form.handleSubmit(handleSubmit)}
             className="flex flex-col gap-3"
           >
             <FormField
@@ -134,26 +204,28 @@ export function ExpensesDialog({
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="plots"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Plots</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {!updateExpense?.fixed && (
+                <FormField
+                  control={form.control}
+                  name="plots"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Plots</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          disabled={updateExpense?.fixed}
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(parseInt(e.target.value) || 0)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             <div className="flex flex-row items-center gap-4">
@@ -204,6 +276,7 @@ export function ExpensesDialog({
                     <FormItem className="flex flex-row  gap-2">
                       <FormControl className="flex space-x-2">
                         <Checkbox
+                          disabled={updateExpense ? true : false}
                           id="fixed"
                           checked={field.value}
                           onCheckedChange={field.onChange}
@@ -219,7 +292,7 @@ export function ExpensesDialog({
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit">Save changes</Button>
+              <Button type="submit">{updateExpense ? "Update" : "Save"}</Button>
             </div>
           </form>
         </Form>
