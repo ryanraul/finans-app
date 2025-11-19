@@ -1,6 +1,5 @@
 import AppProvider from "@/contexts/AppContext";
 import "./globals.css";
-import React from "react";
 import { ThemeProvider } from "next-themes";
 
 export default function RootLayout({
@@ -24,9 +23,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <React.StrictMode>
-            <AppProvider>{children}</AppProvider>
-          </React.StrictMode>
+          <AppProvider>{children}</AppProvider>
         </ThemeProvider>
       </body>
     </html>

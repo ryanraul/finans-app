@@ -32,10 +32,14 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
 
+  table
+    .getRowModel()
+    .rows.filter((r) => r.getVisibleCells())
+    .forEach((element) => console.log("v => ", element));
+
   const getColumnWithTotal = () => {
-    table
-      .getRowModel()
-      .rows.filter((r) => r.getVisibleCells().some((cell) => {}));
+    table.getRowModel().rows.filter((r) => r.getVisibleCells());
+    // .reduce((acc, cell) => acc + cell.getValue()));
 
     return "";
   };
@@ -83,12 +87,14 @@ export function DataTable<TData, TValue>({
             </TableRow>
           )}
         </TableBody>
-        {/* <TableFooter>
+        <TableFooter>
           <TableRow>
-            <TableCell colSpan={2}> {getColumnWithTotal()}</TableCell>
-            <TableCell className="text-right">$2,500.00</TableCell>
+            <TableCell colSpan={columns.length - 1}>
+              {getColumnWithTotal()}
+            </TableCell>
+            {/* <TableCell className="text-right">$2,500.00</TableCell> */}
           </TableRow>
-        </TableFooter> */}
+        </TableFooter>
       </Table>
     </div>
   );

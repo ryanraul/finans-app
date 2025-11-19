@@ -27,11 +27,13 @@ const AppProvider = ({ children }: any) => {
   const [user, setUser] = useState<User | undefined>(undefined);
   const [accountId, setAccountId] = useState<number>();
   const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
-  const isInitialized = useRef(false); // Previne execução duplicada
+  const isInitialized = useRef(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Previne múltiplas execuções
+    // Previne execução duplicada do StrictMode
+
+    console.log("isInitialized.current", isInitialized.current);
     if (isInitialized.current) return;
     isInitialized.current = true;
 
@@ -61,8 +63,8 @@ const AppProvider = ({ children }: any) => {
         const cookies = new Cookies();
         cookies.remove("refreshToken", { path: "/" });
         setUser(undefined);
+        setAccountId(undefined);
       } finally {
-        // CRÍTICO: sempre define loading como false
         setIsSessionLoading(false);
       }
     };
@@ -76,9 +78,15 @@ const AppProvider = ({ children }: any) => {
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
     } finally {
+      // Limpa estado primeiro
       setUser(undefined);
       setAccountId(undefined);
-      // Use router.push ao invés de redirect
+
+      // Limpa cookies
+      const cookies = new Cookies();
+      cookies.remove("refreshToken", { path: "/" });
+
+      // Redireciona usando router
       router.push("/auth");
     }
   }

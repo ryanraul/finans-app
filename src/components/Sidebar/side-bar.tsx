@@ -27,9 +27,11 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useTheme } from "next-themes";
+import { User } from "@/app/auth/types/User";
 
 interface IAppSideBarProps {
   logout: () => void;
+  user?: User;
 }
 
 const items = [
@@ -84,7 +86,7 @@ export function AppSidebar(appSideBarProps: IAppSideBarProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Username
+                  <User2 /> {appSideBarProps.user?.Username}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

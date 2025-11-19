@@ -1,4 +1,4 @@
-import AppProvider from "@/contexts/AppContext";
+// src/app/(home)/page.tsx
 import React from "react";
 
 export default function Home({
@@ -6,9 +6,5 @@ export default function Home({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <React.StrictMode>
-      <AppProvider>{children}</AppProvider>
-    </React.StrictMode>
-  );
+  return <>{children}</>;
 }
